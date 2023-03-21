@@ -12,57 +12,60 @@ class player:
     """
 
     def __init__(self, pHealth, pAttack, pDefence, pLuck, pName, pLocation):
-        self.health = pHealth
-        self.attack = pAttack
-        self.defence = pDefence
-        self.luck = pLuck
-        self.name = pName
-        self.location = pLocation
+        self._health = pHealth
+        self._attack = pAttack
+        self._defence = pDefence
+        self._luck = pLuck
+        self._name = pName
+        self._location = pLocation
 
     @property
     def health(self):
-        return self.health
+        return self._health
 
     @health.setter
     def health(self, newHealth):
-        self.health = newHealth
+        self._health = newHealth
 
     @property
     def attack(self):
-        return self.attack
+        return self._attack
 
     @attack.setter
     def attack(self, newAttack):
-        self.attack = newAttack
+        self._attack = newAttack
 
     @property
     def luck(self):
-        return self.luck
+        return self._luck
 
     @luck.setter
     def luck(self, newLuck):
-        self.luck = newLuck
+        self._luck = newLuck
 
     @property
     def defence(self):
-        return self.defence
+        return self._defence
 
     @defence.setter
     def defence(self, newDefence):
-        self.defence = newDefence
+        self._defence = newDefence
 
     @property
     def name(self):
-        return self.name
+        return self._name
 
-    def setName(self, newName):
-        self.name = newName
+    @name.setter
+    def name(self, newName):
+        self._name = newName
 
-    def getLocation(self):
-        return self.location
+    @property
+    def location(self):
+        return self._location
 
-    def setLocation(self, newLocation):
-        self.location = newLocation
+    @location.setter
+    def location(self, newLocation):
+        self._location = newLocation
 
 
 #getters and setters for enemy
@@ -73,62 +76,78 @@ class enemy:
 
     def __init__(self, eHealth, eAttack, eDefence, eSpecial, eChance, eName,
                  eSpecialtime, eMagicresist):
-        self.health = eHealth
-        self.attack = eAttack
-        self.defence = eDefence
-        self.special = eSpecial
-        self.chance = eChance
-        self.name = eName
-        self.specialtime = eSpecialtime
-        self.magicresist = eMagicresist
+        self._health = eHealth
+        self._attack = eAttack
+        self._defence = eDefence
+        self._special = eSpecial
+        self._chance = eChance
+        self._name = eName
+        self._specialtime = eSpecialtime
+        self._magicresist = eMagicresist
 
-    def getHealth(self):
-        return self.health
+    @property
+    def health(self):
+        return self._health
 
-    def getAttack(self):
-        return self.attack
+    @property
+    def attack(self):
+        return self._attack
 
-    def getDefence(self):
-        return self.defence
+    @property
+    def defence(self):
+        return self._defence
 
-    def getSpecial(self):
-        return self.special
+    @property
+    def special(self):
+        return self._special
 
-    def getChance(self):
-        return self.chance
+    @property
+    def chance(self):
+        return self._chance
 
-    def getName(self):
-        return self.name
+    @property
+    def name(self):
+        return self._name
 
-    def getSpecialtime(self):
-        return self.specialtime
+    @property
+    def specialtime(self):
+        return self._special
 
-    def getMagicresist(self):
-        return self.magicresist
+    @property
+    def magicresist(self):
+        return self._magicresist
 
-    def setHealth(self, newHealth):
-        self.health = newHealth
+    @health.setter
+    def health(self, newHealth):
+        self._health = newHealth
 
-    def setAttack(self, newAttack):
-        self.attack = newAttack
+    @attack.setter
+    def attack(self, newAttack):
+        self._attack = newAttack
 
-    def setDefence(self, newDefence):
-        self.defence = newDefence
+    @defence.setter
+    def defence(self, newDefence):
+        self._defence = newDefence
 
-    def setSpecial(self, newSpecial):
-        self.special = newSpecial
+    @special.setter
+    def special(self, newSpecial):
+        self._special = newSpecial
 
-    def setChance(self, newChance):
-        self.chance = newChance
+    @chance.setter
+    def chance(self, newChance):
+        self._chance = newChance
 
-    def setName(self, newName):
-        self.name = newName
+    @name.setter
+    def name(self, newName):
+        self._name = newName
 
-    def setSpecialtime(self, newSpecialtime):
-        self.specialtime = newSpecialtime
+    @specialtime.setter
+    def specialtime(self, newSpecialtime):
+        self._specialtime = newSpecialtime
 
-    def setMagicresist(self, newMagicresist):
-        self.magicresist = newMagicresist
+    @magicresist.setter
+    def magicresist(self, newMagicresist):
+        self._magicresist = newMagicresist
 
 
 def enemyGen(level):
@@ -373,15 +392,15 @@ def combat(enemy, character):
         "An enemy has spotted you.\nYou get ready and are now entering combat."
     )
     time.sleep(2)
-    print("A wild", enemy.getName(), "has appeared!")
-    print("The enemy's health is", enemy.getHealth())
+    print("A wild", enemy.name, "has appeared!")
+    print("The enemy's health is", enemy.health)
     combat = True
     while combat == True:
         time.sleep(1)
         print("What action do you want to take?\nFight(1) - Attack:",
-              character.getAttack(),
-              "\nCast Spell(2) - Cooldown:", magic_cd, "\nBlock(3) - Defence:",
-              character.getDefence(), "\nFlee(4) - Luck:", character.getLuck(),
+              character.attack, "\nCast Spell(2) - Cooldown:", magic_cd,
+              "\nBlock(3) - Defence:", character.defence, "\nFlee(4) - Luck:",
+              character.luck,
               "\nInspect(5) - View Enemy's Stats.".format(magic_cd))
         time.sleep(.75)
         action = input(">")
@@ -400,24 +419,24 @@ def combat(enemy, character):
                 print(
                     "You prepare for an attack against your motionless enemy!")
                 time.sleep(1)
-                damage = character.getAttack() * 2
-                enemy.setHealth(enemy.getHealth() - damage)
+                damage = character.attack * 2
+                enemy.setHealth(enemy.health - damage)
                 print("You damage the enemy for,", damage,
-                      "health.\nIts health is now,", enemy.getHealth(), "!")
+                      "health.\nIts health is now,", enemy.health, "!")
                 sleep = False
                 time.sleep(1)
                 print("Your exceptional attack woke up the enemy!")
-            elif character.getAttack() < enemy.getDefence():
+            elif character.attack < enemy.defence:
                 print("You notice your enemy's overwhelming defence....")
             else:
-                damage = character.getAttack() - enemy.getDefence()
+                damage = character.attack - enemy.defence
                 print("You prepare for an attack.")
-                hit = hitChance(character.getLuck(), enemy.getChance())
-                crit = critChance(character.getLuck())
+                hit = hitChance(character.luck, enemy.chance)
+                crit = critChance(character.luck)
                 if hit == True:
                     if crit == True:
                         crit_dmg = damage * 2
-                        enemy.setHealth(enemy.getHealth() - crit_dmg)
+                        enemy.health(enemy.health - crit_dmg)
                         print("......")
                         time.sleep(1.5)
                         print("......")
@@ -426,21 +445,19 @@ def combat(enemy, character):
                         time.sleep(2.5)
                         print("CRITICAL HIT!!!!")
                         time.sleep(1)
-                        print("You damage the enemy for,",
-                              crit_dmg, "health.\nIts health is now,",
-                              enemy.getHealth(), "!")
+                        print("You damage the enemy for,", crit_dmg,
+                              "health.\nIts health is now,", enemy.health, "!")
                     else:
-                        enemy.setHealth(enemy.getHealth() - damage)
+                        enemy.health = (enemy.health - damage)
                         time.sleep(2)
-                        print("You damage the enemy for,",
-                              damage, "health.\nIts health is now,",
-                              enemy.getHealth(), "!")
+                        print("You damage the enemy for,", damage,
+                              "health.\nIts health is now,", enemy.health, "!")
                         count += 1
                 else:
                     print("You missed!")
         elif action == "2":
-            cast_try = castSleep(character.getLuck(), enemy.getChance(),
-                                 enemy.getMagicresist())
+            cast_try = castSleep(character.luck, enemy.chance,
+                                 enemy.magicresist)
             if cast_try == True and magic_cd == 0:
                 print("......")
                 time.sleep(1.5)
@@ -468,13 +485,13 @@ def combat(enemy, character):
         elif action == "3":
             crit = False
             try_parry = True
-            blocked_dmg = character.getDefence()
+            blocked_dmg = character.defence
             print("You prepare for the enemy's attack....")
             count += 1
         elif action == "4":
             crit = False
-            flee = character.getLuck()
-            if flee < enemy.getChance() or enemy.getDefence() == 0:
+            flee = character.luck
+            if flee < enemy.chance or enemy.defence == 0:
                 print("You haven't sucessfully fled...")
                 count += 1
             else:
@@ -486,7 +503,7 @@ def combat(enemy, character):
             action = input("> ")
             continue
 
-        enemyDead = isDead(enemy.getHealth())
+        enemyDead = isDead(enemy.health)
 
         if sleep == True:
             time.sleep(.75)
@@ -496,74 +513,70 @@ def combat(enemy, character):
             count += 1
         else:
             if enemyDead == False:
-                if count + 1 == enemy.getSpecialtime():
+                if count + 1 == enemy.specialtime:
                     time.sleep(1)
                     print("The enemy is staring at you.....")
                     magic_cd -= 1
-                if count >= enemy.getSpecialtime() and try_parry == True:
+                if count >= enemy.specialtime and try_parry == True:
                     count = 0
                     print("The enemy's special attack affected your stance!!")
                     try_parry = False
-                    character.setHealth(
-                        character.getHealth() -
-                        enemySpecialAttack(enemy.getSpecial(), enemy.getName(),
-                                           character.getDefence()))
-                    characterDead = isDead(character.getHealth())
+                    character.health(character.health - enemySpecialAttack(
+                        enemy.special, enemy.name, character.defence))
+                    characterDead = isDead(character.health)
                     magic_cd -= 1
                     count = 0
                 elif try_parry == True:
-                    if blocked_dmg > enemy.getAttack():
+                    if blocked_dmg > enemy.attack:
                         time.sleep(2)
                         print("You parried the enemy's attack!")
-                        characterDead = isDead(character.getHealth())
+                        characterDead = isDead(character.health)
                         blocked_dmg = 0
                         magic_cd -= 1
                     else:
                         time.sleep(2)
                         print("The enemy's attack overwhelmed your defence!")
-                        character.setHealth(
-                            character.getHealth() -
-                            enemyAttack(enemy.getChance(), enemy.getAttack(),
-                                        enemy.getName(), character.getDefence(
-                                        ), character.getLuck()))
-                        characterDead = isDead(character.getHealth())
+                        character.health(
+                            character.health -
+                            enemyAttack(enemy.chance, enemy.attack, enemy.name,
+                                        character.defence, character.luck))
+                        characterDead = isDead(character.health)
                         magic_cd -= 1
                 else:
                     #enemy attack minus player health
-                    character.setHealth(character.getHealth() - enemyAttack(
-                        enemy.getChance(), enemy.getAttack(), enemy.getName(),
-                        character.getDefence(), character.getLuck()))
-                    characterDead = isDead(character.getHealth())
+                    character.setHealth(
+                        character.health -
+                        enemyAttack(enemy.chance, enemy.attack, enemy.name,
+                                    character.defence, character.luck))
+                    characterDead = isDead(character.health)
                     magic_cd -= 1
 
                 #if you're dead ends combat and plays gameover
                 if characterDead == True:
                     combat = False
-                    gameOver(character.getName())
+                    gameOver(character.name)
 
                 else:
                     time.sleep(1.5)
-                    print("You have", character.getHealth(),
-                          "health remaining.")
-                    print("The enemy has", enemy.getHealth(),
-                          "health remaining.")
+                    print("You have", character.health, "health remaining.")
+                    print("The enemy has", enemy.health, "health remaining.")
             else:
                 #ends combat if you have defeated the enemy and regenerates health
                 combat = False
                 print("You have sucessfully defeated the enemy!!!")
-                if character.getHealth() != 100:
-                    character.setHealth(character.getHealth +
-                                        random.randint(1, character.genLuck))
-                    if character.getHealth() > 100:
-                        character.setHealth = 100
+                if character.health != 100:
+                    character.health(character.health +
+                                     random.randint(1, character.luck))
+                    if character.health > 100:
+                        character.health = 100
                     else:
                         time.sleep(1.5)
                         print(
                             "You have regenerated.\nYour health after combat is",
-                            character.getHealth())
+                            character.health)
                         print("All cooldowns reset!")
                 else:
-                    character.setHealth = 100
+                    character.health = 100
                     time.sleep(1.5)
                     print("You have 100 Health.")
                     print("All cooldowns reset!")
@@ -713,7 +726,7 @@ map = {
         UP: 'c2',
         DOWN: '',
         RIGHT: 'd3',
-        LEFT: ''
+        LEFT: 'b3'
     },
     'c4': {
         PLACENAME: 'void',
@@ -763,13 +776,13 @@ def prompt(character):
             """)
 
     elif action.lower() in ['move', 'm']:
-        print(character.getLocation())
-        player_move(character.getLocation())
+        print(character.location)
+        player_move(character, character.location)
     # elif action == "fight" or 'f':
     #     player_combat(enemy, character)
 
 
-def player_move(location):
+def player_move(character, location):
     """Moves the player
 
     Args:
@@ -780,22 +793,22 @@ def player_move(location):
 
     if dest in ['up', 'north', 'n']:
         destination = map[location][UP]
-        move_handler(destination, location)
+        move_handler(destination, location, character)
     elif dest in ['down', 'south', 's']:
         destination = map[location][DOWN]
-        move_handler(destination, location)
+        move_handler(destination, location, character)
     elif dest in ['right', 'east', 'e']:
         destination = map[location][RIGHT]
-        move_handler(destination, location)
+        move_handler(destination, location, character)
     elif dest in ['left', 'west', 'w']:
         destination = map[location][LEFT]
-        move_handler(destination, location)
+        move_handler(destination, location, character)
     else:
         print("Invalid Input (Try 'right or east')")
-        player_move(location)
+        player_move(character, location)
 
 
-def move_handler(dest, location):
+def move_handler(dest, location, character):
     """Handles movement by changing the player's current location and setting it as the new pos
 
     Args:
@@ -804,6 +817,7 @@ def move_handler(dest, location):
     """
 
     print("\n" + "You have moved to " + dest + ".")
+    setattr(player, 'location', dest)
     current_pos(dest)
 
 
@@ -811,7 +825,6 @@ def current_pos(location):
     """checks where the player is and prints it
     """
     print(map[location][PLACENAME])
-    print(location)
 
 
 def player_inspect(character):
@@ -837,6 +850,7 @@ def check_move():
 
 
 def createClass():
+    global playerHealth
     global playerAttack
     global playerDefence
     global playerLuck
@@ -853,6 +867,7 @@ def createClass():
         ).lower()
     if planet_choice == "earth":
         #stats
+        playerHealth = 100
         playerAttack = 999  #15
         playerDefence = 10
         playerLuck = random.randint(1, 10)
@@ -868,13 +883,13 @@ def createClass():
                 break
     else:
         print("Invalid Input!!")
-    return (playerAttack, playerDefence, playerLuck, playerName,
+    return (playerHealth, playerAttack, playerDefence, playerLuck, playerName,
             playerLocation)
 
 
 def intro_to_earth(character):
     while True:
-        print(character.getName())
+        print(character.name)
         prompt(character)
     # print("Good job, let's get out of here!")
     # #time.sleep(2)
@@ -961,8 +976,10 @@ def tutorial():
         "Hello!\nBefore we practice the combat system. We need to pick a planet to go to for your main mission. We recommend Earth for your first mission."
     )
     class_data = createClass()
-    character = player(100, class_data[0], class_data[1], class_data[2],
-                       class_data[3], class_data[4])
+
+    character = player(class_data[0], class_data[1], class_data[2],
+                       class_data[3], class_data[4], class_data[5])
+
     pprint(vars(character))
     #time.sleep(3)
     print(
@@ -985,39 +1002,38 @@ def tutorial():
     print("1")
     #time.sleep(1)
     print("Let's practice!!")
-    intro_to_earth(character)
 
-    # finished_tutorial = combat(enemyGen(0), character)
-    # if finished_tutorial:
-    #     #time.sleep(2)
-    #     print("You have completed the tutorial")
-    #     tries = 0
-    # else:
-    #     print("Mission Failed!")
-    #     tries = 0
-    # while tries < 5:
-    #     print("Do you wanna try again. 1 for yes. 2 for no(continue story).")
-    #     tutorial_try = input(">")
-    #     if tutorial_try == "1":
-    #         print("3")
-    #         time.sleep(1)
-    #         print("2")
-    #         time.sleep(1)
-    #         print("1")
-    #         time.sleep(1)
-    #         print("Let's practice!!")
-    #         finished_tutorial = combat(enemyGen(0), character)
-    #         if finished_tutorial == True:
-    #             time.sleep(2)
-    #             print("You have completed the tutorial")
-    #             tries += 1
-    #         else:
-    #             print("Mission Failed!")
-    #             tries += 1
-    #     elif tutorial_try == "2":
-    #         intro_to_earth(character)
-    #     else:
-    #         print("Invalid input!")
+    finished_tutorial = combat(enemyGen(0), character)
+    if finished_tutorial:
+        #time.sleep(2)
+        print("You have completed the tutorial")
+        tries = 0
+    else:
+        print("Mission Failed!")
+        tries = 0
+    while tries < 5:
+        print("Do you wanna try again. 1 for yes. 2 for no(continue story).")
+        tutorial_try = input(">")
+        if tutorial_try == "1":
+            print("3")
+            time.sleep(1)
+            print("2")
+            time.sleep(1)
+            print("1")
+            time.sleep(1)
+            print("Let's practice!!")
+            finished_tutorial = combat(enemyGen(0), character)
+            if finished_tutorial == True:
+                time.sleep(2)
+                print("You have completed the tutorial")
+                tries += 1
+            else:
+                print("Mission Failed!")
+                tries += 1
+        elif tutorial_try == "2":
+            intro_to_earth(character)
+        else:
+            print("Invalid input!")
 
 
 tutorial()
