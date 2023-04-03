@@ -598,148 +598,150 @@ def clear():
 PLACENAME = 'placename'
 DESCRIPTION = 'description'
 INSPECT = 'inspect'
-NPC = ''
-ENEMY = 'level 0'
-UP = 'up', 'north'
-DOWN = 'down', 'south'
-RIGHT = 'right', 'east'
-LEFT = 'left', 'west'
+ITEMS = 'items'
+NPC = 'npc'
+ENEMY = 'enemy'
+DIRECTIONS = 'directions'
 
 map = {
-    'a1': {
-        PLACENAME: 'void',
-        DESCRIPTION: 'void',
-        INSPECT: 'inspect',
-        NPC: '',
-        ENEMY: '',
-        UP: '',
-        DOWN: '',
-        RIGHT: '',
-        LEFT: ''
-    },
-    'a2': {
-        PLACENAME: 'void',
-        DESCRIPTION: 'void',
-        INSPECT: 'inspect',
-        NPC: '',
-        ENEMY: '',
-        UP: '',
-        DOWN: '',
-        RIGHT: '',
-        LEFT: ''
-    },
+    #npc test a3
     'a3': {
         PLACENAME: 'Start Position',
         DESCRIPTION: 'A fire broke out in the lab, talk to Dr. Ock',
         INSPECT: 'There is a big hallway in front of you.',
-        NPC: '',
-        ENEMY: '',
-        UP: '',
-        DOWN: '',
-        RIGHT: 'b3',
-        LEFT: ''
-    },
-    'a4': {
-        PLACENAME: 'void',
-        DESCRIPTION: 'void',
-        INSPECT: 'inspect',
-        NPC: '',
-        ENEMY: '',
-        UP: '',
-        DOWN: '',
-        RIGHT: '',
-        LEFT: ''
-    },
-    'b1': {
-        PLACENAME: 'void',
-        DESCRIPTION: 'void',
-        INSPECT: 'inspect',
-        NPC: '',
-        ENEMY: '',
-        UP: '',
-        DOWN: '',
-        RIGHT: '',
-        LEFT: ''
-    },
-    'b2': {
-        PLACENAME: 'void',
-        DESCRIPTION: 'void',
-        INSPECT: 'inspect',
-        NPC: '',
-        ENEMY: '',
-        UP: '',
-        DOWN: '',
-        RIGHT: '',
-        LEFT: ''
+        NPC: {
+            'name': 'test',
+            'description': 'test'
+        },
+        DIRECTIONS: {
+            'north': 'b3'
+        },
     },
     'b3': {
         PLACENAME: 'Lab Hallway',
         DESCRIPTION: 'A long hallway that leads to the emergency escape pods.',
         INSPECT: 'There is a big hallway in front of you.',
-        NPC: '',
-        ENEMY: '',
-        UP: '',
-        DOWN: '',
-        RIGHT: 'c3',
-        LEFT: 'a3'
-    },
-    'b4': {
-        PLACENAME: 'void',
-        DESCRIPTION: 'void',
-        INSPECT: 'inspect',
-        NPC: '',
-        ENEMY: '',
-        UP: '',
-        DOWN: '',
-        RIGHT: '',
-        LEFT: ''
+        DIRECTIONS: {
+            'north': 'c3'
+        },
     },
     'c1': {
         PLACENAME: 'Bio Lab',
         DESCRIPTION: 'There is something shiny in front of you',
         INSPECT: 'item',
-        NPC: '',
-        ENEMY: '',
-        UP: '',
-        DOWN: 'c2',
-        RIGHT: '',
-        LEFT: ''
+        ITEMS: [],
+        DIRECTIONS: {
+            'south': 'c2'
+        },
     },
     'c2': {
         PLACENAME: 'Bio Lab Door',
         DESCRIPTION: 'A door that has "Biology Lab" written on it',
         INSPECT: 'open',
-        NPC: '',
-        ENEMY: '',
-        UP: 'c1',
-        DOWN: '',
-        RIGHT: '',
-        LEFT: ''
+        DIRECTIONS: {
+            'north': 'c1',
+            'south': 'c3'
+        },
     },
     'c3': {
         PLACENAME: 'Lab Hallway',
         DESCRIPTION:
         'A long hallway that leads to the emergency escape pods, there is a door on your left.',
         INSPECT: 'There is a big hallway in front of you.',
-        NPC: '',
-        ENEMY: '',
-        UP: 'c2',
-        DOWN: '',
-        RIGHT: 'd3',
-        LEFT: 'b3'
+        DIRECTIONS: {
+            'north': 'd3',
+            'west': 'c2'
+        },
     },
-    'c4': {
-        PLACENAME: 'void',
-        DESCRIPTION: 'void',
-        INSPECT: 'inspect',
-        NPC: '',
-        ENEMY: '',
-        UP: '',
-        DOWN: '',
-        RIGHT: '',
-        LEFT: ''
+    'd3': {
+        PLACENAME: 'Lab Hallway',
+        DESCRIPTION: 'It continues...',
+        INSPECT: 'You see a light in the distance.',
+        DIRECTIONS: {
+            'north': 'e3'
+        },
+    },
+    'e1': {
+        PLACENAME: 'Escape Pod Hallway',
+        DESCRIPTION: 'There is something in front of you.',
+        ENEMY: {
+            'name': 'test',
+            'level': '1',
+            'escapable': False
+        },
+        DIRECTIONS: {
+            'south': 'e2',
+            'east': 'f1'
+        },
+    },
+    'e2': {
+        PLACENAME: 'Escape Pod Hallway',
+        DESCRIPTION: 'There is no one here.',
+        DIRECTIONS: {
+            'south': 'e3',
+            'north': 'e1'
+        },
+    },
+    'e3': {
+        PLACENAME: 'Lab Hallway',
+        DESCRIPTION: 'There is another hallway on your left.',
+        INSPECT: 'You see a light in the distance.',
+        DIRECTIONS: {
+            'north': 'f3',
+            'east': 'e2'
+        },
+    },
+    'f1': {
+        PLACENAME: 'Escape Pod Hallway',
+        DESCRIPTION: 'There is a green light in front of you...',
+        DIRECTIONS: {
+            'north': 'g1',
+            'east': 'e2'
+        },
+    },
+    #dr ock
+    'f3': {
+        PLACENAME: 'Lab Hallway',
+        DESCRIPTION: "You're almost there keep going....",
+        INSPECT: 'You see a light in the distance.',
+        NPC: {
+            'name': 'Dr. Ock',
+            'description': '....'
+        },
+        DIRECTIONS: {
+            'north': 'g3',
+        },
+    },
+    #escape tp to other square
+    'g1': {
+        PLACENAME: 'Escape Pods',
+        DESCRIPTION: 'Escape.',
+        INSPECT: 'escape',
+    },
+    'g2': {
+        PLACENAME: 'Escape Pod Hallway',
+        DESCRIPTION: 'There is a green light in front of you...',
+        DIRECTIONS: {
+            'north': 'g1',
+            'south': 'g3'
+        },
+    },
+    'g3': {
+        PLACENAME: 'Junction Lab Hallway',
+        DESCRIPTION: 'There is a sign in front of you "<---- Escape Pods"',
+        INSPECT: 'The left hallway is blocked...',
+        DIRECTIONS: {
+            'west': 'g2',
+        },
     },
 }
+
+
+def npc(name):
+    if name == "test2":
+        print("Test2: Hello world!")
+    else:
+        print('null')
 
 
 def prompt(character):
@@ -748,7 +750,8 @@ def prompt(character):
     print("What do you want to do?")
     action = input("> ")
     legal_actions = [
-        'move', 'inspect', 'fight', 'help', 'quit', 'm', 'i', 'f', 'h', 'q'
+        'move', 'inspect', 'fight', 'help', 'quit', 'm', 'i', 'f', 'h', 'q',
+        'talk', 't'
     ]
     while action not in legal_actions:
         print("Illegal action, please input again!")
@@ -776,44 +779,51 @@ def prompt(character):
             """)
 
     elif action.lower() in ['move', 'm']:
-        print(character.location)
-        player_move(character, character.location)
+        player_move(character.location)
+
+    elif action.lower() in ['talk', 't']:
+        npc(map[character.location][NPC])
+
     # elif action == "fight" or 'f':
     #     player_combat(enemy, character)
 
 
-def player_move(character, location):
+def player_move(location):
     """Moves the player
 
     Args:
         movement (str)
     """
-    q = "Where to next?"
+    q = "Where to next? (N, S, E, W)"
     dest = input(q).lower()
 
-    if dest in ['up', 'north', 'n']:
-        destination = map[location][UP]
-        move_handler(destination, location, character)
-    elif dest in ['down', 'south', 's']:
-        destination = map[location][DOWN]
-        move_handler(destination, location, character)
-    elif dest in ['right', 'east', 'e']:
-        destination = map[location][RIGHT]
-        move_handler(destination, location, character)
-    elif dest in ['left', 'west', 'w']:
-        destination = map[location][LEFT]
-        move_handler(destination, location, character)
+    direction_synonyms = {
+        'north': ['n', 'up', 'u'],
+        'south': ['s', 'down', 'd'],
+        'east': ['e', 'right', 'r'],
+        'west': ['w', 'left', 'l']
+    }
+
+    if dest in map[location][DIRECTIONS]:
+        destination = map[location][DIRECTIONS][dest]
+        move_handler(destination)
     else:
-        print("Invalid Input (Try 'right or east')")
-        player_move(character, location)
+        for key, value in direction_synonyms.items():
+            if dest in value:
+                if key in map[location][DIRECTIONS]:
+                    destination = map[location][DIRECTIONS][key]
+                    move_handler(destination)
+                    break
+        else:
+            print("You cannot move that way!")
+            player_move(location)
 
 
-def move_handler(dest, location, character):
+def move_handler(dest):
     """Handles movement by changing the player's current location and setting it as the new pos
 
     Args:
         dest (str): destination
-        character (obj): player
     """
 
     print("\n" + "You have moved to " + dest + ".")
@@ -825,6 +835,14 @@ def current_pos(location):
     """checks where the player is and prints it
     """
     print(map[location][PLACENAME])
+    print(map[location][DESCRIPTION])
+    if NPC in map[location]:
+        print("Someone's waving at you... (Type talk)")
+        #NPC interaction function
+
+    if ENEMY in map[location]:
+        print("enemy")
+        #ENEMY FIGHT OR flee interaction function
 
 
 def player_inspect(character):
@@ -835,15 +853,6 @@ def player_inspect(character):
         character (obj): player
     """
     print(map[character.getLocation()][INSPECT])
-
-
-def check_move():
-    """Checks if the player can move to a square adjacent to them. 
-
-    Returns:
-        Boolean
-    """
-    # if map['']:
 
 
 ### GAMELOOP ###
@@ -889,7 +898,6 @@ def createClass():
 
 def intro_to_earth(character):
     while True:
-        print(character.name)
         prompt(character)
     # print("Good job, let's get out of here!")
     # #time.sleep(2)
@@ -1002,38 +1010,39 @@ def tutorial():
     print("1")
     #time.sleep(1)
     print("Let's practice!!")
+    intro_to_earth(character)
 
-    finished_tutorial = combat(enemyGen(0), character)
-    if finished_tutorial:
-        #time.sleep(2)
-        print("You have completed the tutorial")
-        tries = 0
-    else:
-        print("Mission Failed!")
-        tries = 0
-    while tries < 5:
-        print("Do you wanna try again. 1 for yes. 2 for no(continue story).")
-        tutorial_try = input(">")
-        if tutorial_try == "1":
-            print("3")
-            time.sleep(1)
-            print("2")
-            time.sleep(1)
-            print("1")
-            time.sleep(1)
-            print("Let's practice!!")
-            finished_tutorial = combat(enemyGen(0), character)
-            if finished_tutorial == True:
-                time.sleep(2)
-                print("You have completed the tutorial")
-                tries += 1
-            else:
-                print("Mission Failed!")
-                tries += 1
-        elif tutorial_try == "2":
-            intro_to_earth(character)
-        else:
-            print("Invalid input!")
+    # finished_tutorial = combat(enemyGen(0), character)
+    # if finished_tutorial:
+    #     #time.sleep(2)
+    #     print("You have completed the tutorial")
+    #     tries = 0
+    # else:
+    #     print("Mission Failed!")
+    #     tries = 0
+    # while tries < 5:
+    #     print("Do you wanna try again. 1 for yes. 2 for no(continue story).")
+    #     tutorial_try = input(">")
+    #     if tutorial_try == "1":
+    #         print("3")
+    #         time.sleep(1)
+    #         print("2")
+    #         time.sleep(1)
+    #         print("1")
+    #         time.sleep(1)
+    #         print("Let's practice!!")
+    #         finished_tutorial = combat(enemyGen(0), character)
+    #         if finished_tutorial == True:
+    #             time.sleep(2)
+    #             print("You have completed the tutorial")
+    #             tries += 1
+    #         else:
+    #             print("Mission Failed!")
+    #             tries += 1
+    #     elif tutorial_try == "2":
+    #         intro_to_earth(character)
+    #     else:
+    #         print("Invalid input!")
 
 
 tutorial()
