@@ -2,13 +2,16 @@ import time
 import random
 import math
 import os
+import sys
+import re
 from pprint import pprint
+
 # import tkinter as tk
 
 
 class player:
-    """Gets the player's starting health, atack, luck, defence, and name. 
-       And sets their health, attack, luck, defence, and name when it changes.  
+    """Gets the player's starting health, atack, luck, defence, and name.
+    And sets their health, attack, luck, defence, and name when it changes.
     """
 
     def __init__(self, pHealth, pAttack, pDefence, pLuck, pName, pLocation):
@@ -68,14 +71,23 @@ class player:
         self._location = newLocation
 
 
-#getters and setters for enemy
+# getters and setters for enemy
 class enemy:
-    """Gets the enemy's starting health, atack, luck, defence, and name. 
-       And sets their health, attack, luck, defence, and name when it changes.  
+    """Gets the enemy's starting health, atack, luck, defence, and name.
+    And sets their health, attack, luck, defence, and name when it changes.
     """
 
-    def __init__(self, eHealth, eAttack, eDefence, eSpecial, eChance, eName,
-                 eSpecialtime, eMagicresist):
+    def __init__(
+        self,
+        eHealth,
+        eAttack,
+        eDefence,
+        eSpecial,
+        eChance,
+        eName,
+        eSpecialtime,
+        eMagicresist,
+    ):
         self._health = eHealth
         self._attack = eAttack
         self._defence = eDefence
@@ -151,7 +163,7 @@ class enemy:
 
 
 def enemyGen(level):
-    """Generates enemies by giving them random generated stats (attack, defense etc...) based on their level. 
+    """Generates enemies by giving them random generated stats (attack, defense etc...) based on their level.
 
     Args:
         level (int): The level of enemy to bee generated
@@ -168,8 +180,8 @@ def enemyGen(level):
     lines = file.readlines()
     animal = lines[random.randint(0, len(lines) - 1)][:-1]
     file.close
-    #tutorial bots
-    #end of copy + paste
+    # tutorial bots
+    # end of copy + paste
     if level == 0:
         health = random.randint(25, 30)
         attack = random.randint(1, 5)
@@ -178,9 +190,17 @@ def enemyGen(level):
         chance = 0
         special_time = random.randint(3, 4)
         magic_resist = 0
-        return enemy(health, attack, defence, special, chance,
-                     adjective + " " + animal, special_time, magic_resist)
-    #level 1 bots
+        return enemy(
+            health,
+            attack,
+            defence,
+            special,
+            chance,
+            adjective + " " + animal,
+            special_time,
+            magic_resist,
+        )
+    # level 1 bots
     elif level == 1:
         health = random.randint(40, 50)
         attack = random.randint(5, 15)
@@ -189,9 +209,17 @@ def enemyGen(level):
         chance = random.randint(2, 4)
         special_time = random.randint(4, 5)
         magic_resist = random.randint(1, 3)
-        return enemy(health, attack, defence, special, chance,
-                     adjective + " " + animal, special_time, magic_resist)
-    #level 2 bots
+        return enemy(
+            health,
+            attack,
+            defence,
+            special,
+            chance,
+            adjective + " " + animal,
+            special_time,
+            magic_resist,
+        )
+    # level 2 bots
     elif level == 2:
         health = random.randint(50, 60)
         attack = random.randint(15, 25)
@@ -200,10 +228,18 @@ def enemyGen(level):
         chance = random.randint(4, 6)
         special_time = random.randint(6, 8)
         magic_resist = random.randint(2, 4)
-        return enemy(health, attack, defence, special, chance,
-                     adjective + " " + animal, special_time, magic_resist)
+        return enemy(
+            health,
+            attack,
+            defence,
+            special,
+            chance,
+            adjective + " " + animal,
+            special_time,
+            magic_resist,
+        )
 
-    #boss bots
+    # boss bots
     else:
         health = random.randint(200, 250)
         attack = random.randint(20, 40)
@@ -212,8 +248,16 @@ def enemyGen(level):
         chance = random.randint(4, 10)
         special_time = random.randint(10, 12)
         magic_resist = 8
-        return enemy(health, attack, defence, special, chance,
-                     adjective + " " + animal, special_time, magic_resist)
+        return enemy(
+            health,
+            attack,
+            defence,
+            special,
+            chance,
+            adjective + " " + animal,
+            special_time,
+            magic_resist,
+        )
 
 
 ### COMBAT FUNCTIONS ###
@@ -247,7 +291,7 @@ def enemyAttack(hitChance, attackValue, name, defence, luck):
         return 0
 
 
-#enemy special attack
+# enemy special attack
 def enemySpecialAttack(attackValue, name, defence):
     """Determines how much an enemy has attacked you for using its special
 
@@ -264,12 +308,11 @@ def enemySpecialAttack(attackValue, name, defence):
     time.sleep(2)
     print("it hits you.. ")
     loss = attackValue - defence / 2
-    print("You didn't anticipate it, halving your defence, losing...", loss,
-          "health")
+    print("You didn't anticipate it, halving your defence, losing...", loss, "health")
     return math.ceil(loss)
 
 
-#if your attack is going to hit
+# if your attack is going to hit
 def hitChance(luck, chance):
     """Formula for determining the chance of an enemy hitting the player
 
@@ -305,8 +348,8 @@ def hitChance(luck, chance):
             return True
 
 
-#all special attacks
-#crit
+# all special attacks
+# crit
 def critChance(luck):
     """Determines if attacks are going to crit (deal more damage) or not based on the attacker's luck
 
@@ -330,8 +373,8 @@ def critChance(luck):
         return False
 
 
-#spells
-#sleep
+# spells
+# sleep
 def castSleep(luck, enemyChance, magicRes):
     """Determines if the spell sleep is going to work or not based on the player and enemy's luck and magic resistance
 
@@ -351,16 +394,16 @@ def castSleep(luck, enemyChance, magicRes):
 
 
 def isDead(health):
-    """ Checks if the enemy is dead or not """
+    """Checks if the enemy is dead or not"""
     if health < 1:
         return True
     else:
         return False
 
 
-#gameover with quit()
+# gameover with quit()
 def gameOver(Name):
-    """ Gameover screen """
+    """Gameover screen"""
     print("-----SYSTEMS SHUTTING DOWN-----")
     print("The Planet will now secure your stored data into our database")
     print("Good Bye", Name)
@@ -388,23 +431,33 @@ def combat(enemy, character):
     sleep_time = 0
     magic_cd = 3
 
-    print(
-        "An enemy has spotted you.\nYou get ready and are now entering combat."
-    )
+    print("An enemy has spotted you.\nYou get ready and are now entering combat.")
     time.sleep(2)
     print("A wild", enemy.name, "has appeared!")
     print("The enemy's health is", enemy.health)
     combat = True
     while combat == True:
         time.sleep(1)
-        print("What action do you want to take?\nFight(1) - Attack:",
-              character.attack, "\nCast Spell(2) - Cooldown:", magic_cd,
-              "\nBlock(3) - Defence:", character.defence, "\nFlee(4) - Luck:",
-              character.luck,
-              "\nInspect(5) - View Enemy's Stats.".format(magic_cd))
-        time.sleep(.75)
+        print(
+            "What action do you want to take?\nFight(1) - Attack:",
+            character.attack,
+            "\nCast Spell(2) - Cooldown:",
+            magic_cd,
+            "\nBlock(3) - Defence:",
+            character.defence,
+            "\nFlee(4) - Luck:",
+            character.luck,
+            "\nInspect(5) - View Enemy's Stats.".format(magic_cd),
+        )
+        time.sleep(0.75)
         action = input(">")
-        while action != "1" and action != "2" and action != "3" and action != "4" and action != "5":
+        while (
+            action != "1"
+            and action != "2"
+            and action != "3"
+            and action != "4"
+            and action != "5"
+        ):
             print("Invalid Input! Please try again.")
             action = input("> ")
         if sleep_time == 0 and sleep == True:
@@ -416,13 +469,17 @@ def combat(enemy, character):
             blocked_dmg = 0
             try_parry = False
             if sleep == True:
-                print(
-                    "You prepare for an attack against your motionless enemy!")
+                print("You prepare for an attack against your motionless enemy!")
                 time.sleep(1)
                 damage = character.attack * 2
                 enemy.setHealth(enemy.health - damage)
-                print("You damage the enemy for,", damage,
-                      "health.\nIts health is now,", enemy.health, "!")
+                print(
+                    "You damage the enemy for,",
+                    damage,
+                    "health.\nIts health is now,",
+                    enemy.health,
+                    "!",
+                )
                 sleep = False
                 time.sleep(1)
                 print("Your exceptional attack woke up the enemy!")
@@ -445,19 +502,28 @@ def combat(enemy, character):
                         time.sleep(2.5)
                         print("CRITICAL HIT!!!!")
                         time.sleep(1)
-                        print("You damage the enemy for,", crit_dmg,
-                              "health.\nIts health is now,", enemy.health, "!")
+                        print(
+                            "You damage the enemy for,",
+                            crit_dmg,
+                            "health.\nIts health is now,",
+                            enemy.health,
+                            "!",
+                        )
                     else:
-                        enemy.health = (enemy.health - damage)
+                        enemy.health = enemy.health - damage
                         time.sleep(2)
-                        print("You damage the enemy for,", damage,
-                              "health.\nIts health is now,", enemy.health, "!")
+                        print(
+                            "You damage the enemy for,",
+                            damage,
+                            "health.\nIts health is now,",
+                            enemy.health,
+                            "!",
+                        )
                         count += 1
                 else:
                     print("You missed!")
         elif action == "2":
-            cast_try = castSleep(character.luck, enemy.chance,
-                                 enemy.magicresist)
+            cast_try = castSleep(character.luck, enemy.chance, enemy.magicresist)
             if cast_try == True and magic_cd == 0:
                 print("......")
                 time.sleep(1.5)
@@ -471,7 +537,7 @@ def combat(enemy, character):
                 sleep_time = 2
             elif magic_cd > 0:
                 print("{} more turns to cast 'Sleep'".format(magic_cd))
-                time.sleep(.75)
+                time.sleep(0.75)
                 print(".......")
             else:
                 print("......")
@@ -506,7 +572,7 @@ def combat(enemy, character):
         enemyDead = isDead(enemy.health)
 
         if sleep == True:
-            time.sleep(.75)
+            time.sleep(0.75)
             print("Zzzzz....")
             magic_cd -= 1
             sleep_time -= 1
@@ -521,8 +587,12 @@ def combat(enemy, character):
                     count = 0
                     print("The enemy's special attack affected your stance!!")
                     try_parry = False
-                    character.health(character.health - enemySpecialAttack(
-                        enemy.special, enemy.name, character.defence))
+                    character.health(
+                        character.health
+                        - enemySpecialAttack(
+                            enemy.special, enemy.name, character.defence
+                        )
+                    )
                     characterDead = isDead(character.health)
                     magic_cd -= 1
                     count = 0
@@ -537,21 +607,33 @@ def combat(enemy, character):
                         time.sleep(2)
                         print("The enemy's attack overwhelmed your defence!")
                         character.health(
-                            character.health -
-                            enemyAttack(enemy.chance, enemy.attack, enemy.name,
-                                        character.defence, character.luck))
+                            character.health
+                            - enemyAttack(
+                                enemy.chance,
+                                enemy.attack,
+                                enemy.name,
+                                character.defence,
+                                character.luck,
+                            )
+                        )
                         characterDead = isDead(character.health)
                         magic_cd -= 1
                 else:
-                    #enemy attack minus player health
+                    # enemy attack minus player health
                     character.setHealth(
-                        character.health -
-                        enemyAttack(enemy.chance, enemy.attack, enemy.name,
-                                    character.defence, character.luck))
+                        character.health
+                        - enemyAttack(
+                            enemy.chance,
+                            enemy.attack,
+                            enemy.name,
+                            character.defence,
+                            character.luck,
+                        )
+                    )
                     characterDead = isDead(character.health)
                     magic_cd -= 1
 
-                #if you're dead ends combat and plays gameover
+                # if you're dead ends combat and plays gameover
                 if characterDead == True:
                     combat = False
                     gameOver(character.name)
@@ -561,19 +643,21 @@ def combat(enemy, character):
                     print("You have", character.health, "health remaining.")
                     print("The enemy has", enemy.health, "health remaining.")
             else:
-                #ends combat if you have defeated the enemy and regenerates health
+                # ends combat if you have defeated the enemy and regenerates health
                 combat = False
                 print("You have sucessfully defeated the enemy!!!")
                 if character.health != 100:
-                    character.health(character.health +
-                                     random.randint(1, character.luck))
+                    character.health(
+                        character.health + random.randint(1, character.luck)
+                    )
                     if character.health > 100:
                         character.health = 100
                     else:
                         time.sleep(1.5)
                         print(
                             "You have regenerated.\nYour health after combat is",
-                            character.health)
+                            character.health,
+                        )
                         print("All cooldowns reset!")
                 else:
                     character.health = 100
@@ -584,239 +668,359 @@ def combat(enemy, character):
 
 
 def title():
-    """Prompts player to start
-    """
+    """Prompts player to start"""
     return
 
 
 def clear():
-    """Clears the terminal screen
-    """
-    os.system('cls' if os.name == 'nt' else 'clear')
+    """Clears the terminal screen"""
+    os.system("cls" if os.name == "nt" else "clear")
 
 
-PLACENAME = 'placename'
-DESCRIPTION = 'description'
-INSPECT = 'inspect'
-ITEMS = 'items'
-NPC = 'npc'
-ENEMY = 'enemy'
-DIRECTIONS = 'directions'
-
+PLACENAME = "placename"
+DESCRIPTION = "description"
+INSPECT = "inspect"
+ITEMS = "items"
+NPC = "npc"
+ENEMY = "enemy"
+DIRECTIONS = "directions"
 map = {
-    #npc test a3
-    'a3': {
-        PLACENAME: 'Start Position',
-        DESCRIPTION: 'A fire broke out in the lab, talk to Dr. Ock',
-        INSPECT: 'There is a big hallway in front of you.',
-        NPC: {
-            'name': 'test',
-            'description': 'test'
-        },
-        DIRECTIONS: {
-            'north': 'b3'
-        },
+    # npc test a3
+    "a3": {
+        PLACENAME: "Dr. Ock's lab (Start Position)",
+        DESCRIPTION: "A fire broke out in the lab - find your boss, Dr. Ock",
+        INSPECT: "There is a big hallway in front (north) of you.",
+        DIRECTIONS: {"north": "b3"},
     },
-    'b3': {
-        PLACENAME: 'Lab Hallway',
-        DESCRIPTION: 'A long hallway that leads to the emergency escape pods.',
-        INSPECT: 'There is a big hallway in front of you.',
-        DIRECTIONS: {
-            'north': 'c3'
-        },
+    "b3": {
+        PLACENAME: "Lab Hallway",
+        DESCRIPTION: "A long hallway that leads to the emergency escape pods.",
+        INSPECT: "There is a big hallway in front of you.",
+        DIRECTIONS: {"north": "c3"},
     },
-    'c1': {
-        PLACENAME: 'Bio Lab',
-        DESCRIPTION: 'There is something shiny in front of you',
-        INSPECT: 'item',
+    "c1": {
+        PLACENAME: "Bio Lab",
+        DESCRIPTION: "There is something shiny in front of you",
+        INSPECT: "item",
         ITEMS: [],
-        DIRECTIONS: {
-            'south': 'c2'
-        },
+        DIRECTIONS: {"south": "c2"},
     },
-    'c2': {
-        PLACENAME: 'Bio Lab Door',
+    "c2": {
+        PLACENAME: "Bio Lab Door",
         DESCRIPTION: 'A door that has "Biology Lab" written on it',
-        INSPECT: 'open',
-        DIRECTIONS: {
-            'north': 'c1',
-            'south': 'c3'
-        },
+        INSPECT: "open",
+        DIRECTIONS: {"north": "c1", "south": "c3"},
     },
-    'c3': {
-        PLACENAME: 'Lab Hallway',
-        DESCRIPTION:
-        'A long hallway that leads to the emergency escape pods, there is a door on your left.',
-        INSPECT: 'There is a big hallway in front of you.',
-        DIRECTIONS: {
-            'north': 'd3',
-            'west': 'c2'
-        },
+    "c3": {
+        PLACENAME: "Lab Hallway",
+        DESCRIPTION: "A long hallway that leads to the emergency escape pods, there is a door on your left.",
+        INSPECT: "There is a big hallway in front of you.",
+        DIRECTIONS: {"north": "d3", "west": "c2"},
     },
-    'd3': {
-        PLACENAME: 'Lab Hallway',
-        DESCRIPTION: 'It continues...',
-        INSPECT: 'You see a light in the distance.',
-        DIRECTIONS: {
-            'north': 'e3'
-        },
+    "d3": {
+        PLACENAME: "Lab Hallway",
+        DESCRIPTION: "It continues...",
+        INSPECT: "You see a light in the distance.",
+        DIRECTIONS: {"north": "e3"},
     },
-    'e1': {
-        PLACENAME: 'Escape Pod Hallway',
-        DESCRIPTION: 'There is something in front of you.',
-        ENEMY: {
-            'name': 'test',
-            'level': '1',
-            'escapable': False
-        },
-        DIRECTIONS: {
-            'south': 'e2',
-            'east': 'f1'
-        },
+    "e1": {
+        PLACENAME: "Escape Pod Hallway",
+        DESCRIPTION: "There is something in front of you.",
+        ENEMY: {"name": "test", "level": "1", "escapable": False},
+        DIRECTIONS: {"south": "e2", "east": "f1"},
     },
-    'e2': {
-        PLACENAME: 'Escape Pod Hallway',
-        DESCRIPTION: 'There is no one here.',
-        DIRECTIONS: {
-            'south': 'e3',
-            'north': 'e1'
-        },
+    "e2": {
+        PLACENAME: "Escape Pod Hallway",
+        DESCRIPTION: "There is no one here.",
+        DIRECTIONS: {"south": "e3", "north": "e1"},
     },
-    'e3': {
-        PLACENAME: 'Lab Hallway',
-        DESCRIPTION: 'There is another hallway on your left.',
-        INSPECT: 'You see a light in the distance.',
-        DIRECTIONS: {
-            'north': 'f3',
-            'east': 'e2'
-        },
+    "e3": {
+        PLACENAME: "Lab Hallway",
+        DESCRIPTION: "There is another hallway on your left.",
+        INSPECT: "You see a light in the distance.",
+        DIRECTIONS: {"north": "f3", "east": "e2"},
     },
-    'f1': {
-        PLACENAME: 'Escape Pod Hallway',
-        DESCRIPTION: 'There is a green light in front of you...',
-        DIRECTIONS: {
-            'north': 'g1',
-            'east': 'e2'
-        },
+    "f1": {
+        PLACENAME: "Escape Pod Hallway",
+        DESCRIPTION: "There is a green light in front of you...",
+        DIRECTIONS: {"north": "g1", "east": "e2"},
     },
-    #dr ock
-    'f3': {
-        PLACENAME: 'Lab Hallway',
+    # dr ock
+    "f3": {
+        PLACENAME: "Lab Hallway",
         DESCRIPTION: "You're almost there keep going....",
-        INSPECT: 'You see a light in the distance.',
+        INSPECT: "You see a light in the distance.",
         NPC: {
-            'name': 'Dr. Ock',
-            'description': '....'
+            "name": "Dr. Ock",
+            "description": "A fat man resembling my boss, Dr. Ock.",
+            "dialogue": 1,
+            "escapable": False,
         },
         DIRECTIONS: {
-            'north': 'g3',
+            "north": "g3",
         },
     },
-    #escape tp to other square
-    'g1': {
-        PLACENAME: 'Escape Pods',
-        DESCRIPTION: 'Escape.',
-        INSPECT: 'escape',
+    # escape - tp to other square (make function first)
+    "g1": {
+        PLACENAME: "Escape Pods",
+        DESCRIPTION: "Escape.",
+        INSPECT: "escape",
     },
-    'g2': {
-        PLACENAME: 'Escape Pod Hallway',
-        DESCRIPTION: 'There is a green light in front of you...',
-        DIRECTIONS: {
-            'north': 'g1',
-            'south': 'g3'
-        },
+    "g2": {
+        PLACENAME: "Escape Pod Hallway",
+        DESCRIPTION: "There is a green light in front of you...",
+        DIRECTIONS: {"north": "g1", "south": "g3"},
     },
-    'g3': {
-        PLACENAME: 'Junction Lab Hallway',
+    "g3": {
+        PLACENAME: "Junction Lab Hallway",
         DESCRIPTION: 'There is a sign in front of you "<---- Escape Pods"',
-        INSPECT: 'The left hallway is blocked...',
+        INSPECT: "The left hallway is blocked...",
         DIRECTIONS: {
-            'west': 'g2',
+            "west": "g2",
         },
     },
 }
 
 
-def npc(name):
-    if name == "test2":
-        print("Test2: Hello world!")
-    else:
-        print('null')
+def regex(string):
+    """the regular expression for the string to be split
 
+    Args:
+        string (str): the raw string
 
-def prompt(character):
-    """puts out a prompt for all the possible actions a player can take
+    Returns:
+        bool: true or false if the string fits the REGEX.
     """
-    print("What do you want to do?")
-    action = input("> ")
-    legal_actions = [
-        'move', 'inspect', 'fight', 'help', 'quit', 'm', 'i', 'f', 'h', 'q',
-        'talk', 't'
-    ]
-    while action not in legal_actions:
-        print("Illegal action, please input again!")
-        action = input("> ")
+    pattern = r"[A-Za-z]+\s[A-Za-z]+"
+    if re.match(pattern, string):
+        return True
+    else:
+        return False
 
-    if action.lower() == 'quit':
+
+def split_string(string):
+    """splits the string to two values
+
+    Args:
+        string (str): the raw string
+
+    Returns:
+        str: the split string
+        bool: returns false if str cannot be split
+    """
+    if regex(string):
+        command = string.split(" ")[0]
+        noun = string.split(" ")[1]
+        return command, noun
+    else:
+        return False
+
+
+def text_effect(string):
+    """adds a text effect that writes out strings letter by letter
+
+    Args:
+        string (str): the text
+    """
+    for character in string:
+        sys.stdout.write(character)
+        sys.stdout.flush()
+        time.sleep(0.05)
+
+
+def npc_handler(character):
+    """handles npc interaction
+
+    Args:
+        character (str): the npc name
+    """
+    location = character.location
+    npc_name = map[location][NPC]["name"]
+    npc_desc = map[location][NPC]["description"]
+    npc_dialogue = map[location][NPC]["dialogue"]
+
+    if npc_name == "Dr. Ock":
+        text_effect(npc_desc)
+        dr_ock(npc_dialogue, character)
+
+
+# npc
+
+
+def dr_ock(dialogue, character):
+    """TO-DO: print letter by letter"""
+
+    if dialogue == 1:
+        time.sleep(0.5)
+        text_effect(
+            "\nDr. Ock: You over there! You don't have much time! This whole thing is gonna burn down! Run!"
+        )
         while True:
-            print("Are you sure you want to quit?")
-            quit = input("> ")
-            if quit.lower() == "y":
-                exit()
-            elif quit.lower() == "n":
+            time.sleep(0.5)
+            text_effect(
+                "\n1. What happened here?\n2. Where do I go?\n3. Goodbye\n(Type 1,2,3)\n"
+            )
+            action = input("> ")
+
+            if action == "1":
+                text_effect(
+                    "Someone started a fire in the lab! That person, he escaped! There's no time to catch him, just run."
+                )
+            elif action == "2":
+                text_effect(
+                    "Turn right to the escape pods! It's configurated to go to our lunar base on the Moon. There's only one left. Hurry!"
+                )
+            elif action == "3":
+                text_effect("Farewell!")
+                map[character.location][NPC]["escapable"] = True
                 prompt(character)
                 break
             else:
                 continue
-        exit()
-
-    elif action.lower() == 'help':
-        print("""Move by inputing 'move' or 'm'\n
-                Inspect by inputing 'inspect' or 'i'\n
-                Fight by inputing 'fight' or 'f'\n
-                Stuck? Input 'help' or 'h'\n 
-                Leaving? Input 'quit' or 'q'\n
-            """)
-
-    elif action.lower() in ['move', 'm']:
-        player_move(character.location)
-
-    elif action.lower() in ['talk', 't']:
-        npc(map[character.location][NPC])
-
-    # elif action == "fight" or 'f':
-    #     player_combat(enemy, character)
 
 
-def player_move(location):
+def prompt(character):
+    """puts out a prompt for all the possible actions a player can take"""
+    possible_dir = []
+    for dir in map[character.location][DIRECTIONS]:
+        possible_dir.append(dir)
+    print("------------------------")
+    print("What do you want to do?")
+    print(f"You can move {', '.join(possible_dir)}.")
+    action = input("> ")
+
+    if split_string(action):
+        command, noun = split_string(action)  # type: ignore
+        if command.lower() == "move" or "m":
+            if (
+                NPC in map[character.location]
+                and not map[character.location][NPC]["escapable"]
+            ):
+                print(
+                    f"{map[character.location][NPC]['name']} is waving at you (Type Talk)"
+                )
+            else:
+                player_move(character, character.location, noun)
+    else:
+        legal_actions = [
+            "move",
+            "inspect",
+            "fight",
+            "help",
+            "quit",
+            "m",
+            "i",
+            "f",
+            "h",
+            "q",
+            "talk",
+            "t",
+        ]
+        while action not in legal_actions:
+            if split_string(action):
+                command, noun = split_string(action)  # type: ignore
+                if command.lower() == "move" or "m":
+                    if (
+                        NPC in map[character.location]
+                        and not map[character.location][NPC]["escapable"]
+                    ):
+                        print(
+                            f"{map[character.location][NPC]['name']} is waving at you (Type Talk)"
+                        )
+                        break
+                    else:
+                        player_move(character, character.location, noun)
+                        break
+            else:
+                print("Illegal action, please input again!")
+                action = input("> ")
+                continue
+
+        if action.lower() == "quit":
+            while True:
+                print("Are you sure you want to quit?")
+                quit = input("> ")
+                if quit.lower() == "y":
+                    exit()
+                elif quit.lower() == "n":
+                    prompt(character)
+                    break
+                else:
+                    continue
+
+        elif action.lower() == "help":
+            print(
+                "Move by inputing 'move' or 'm' OR type move then the location (e.g. move north)\nInspect by inputing 'inspect' or 'i'\nFight by inputing 'fight' or 'f'\nStuck? Input 'help' or 'h'\nLeaving? Input 'quit' or 'q'\n "
+            )
+
+        elif action.lower() in ["move", "m"]:
+            if (
+                NPC in map[character.location]
+                and not map[character.location][NPC]["escapable"]
+            ):
+                print(
+                    f"{map[character.location][NPC]['name']} is waving at you (Type talk)"
+                )
+            # add later elif ENEMY in map[location] and not map[character.location][ENEMY]['escapable']:
+            else:
+                player_move(character, character.location, None)
+
+        elif action.lower() in ["talk", "t"]:
+            npc_handler(character)
+
+        # elif action == "fight" or 'f':
+        #     player_combat(enemy, character)
+
+
+def player_move(character, location, action):
     """Moves the player
 
     Args:
         movement (str)
     """
-    q = "Where to next? (N, S, E, W)"
-    dest = input(q).lower()
-
     direction_synonyms = {
-        'north': ['n', 'up', 'u'],
-        'south': ['s', 'down', 'd'],
-        'east': ['e', 'right', 'r'],
-        'west': ['w', 'left', 'l']
+        "north": ["n", "up", "u"],
+        "south": ["s", "down", "d"],
+        "east": ["e", "right", "r"],
+        "west": ["w", "left", "l"],
     }
+    if not action:
+        q = "Where to next? (N, S, E, W)"
+        dest = input(q).lower()
 
-    if dest in map[location][DIRECTIONS]:
-        destination = map[location][DIRECTIONS][dest]
-        move_handler(destination)
-    else:
-        for key, value in direction_synonyms.items():
-            if dest in value:
-                if key in map[location][DIRECTIONS]:
-                    destination = map[location][DIRECTIONS][key]
-                    move_handler(destination)
-                    break
+        if dest in map[location][DIRECTIONS]:
+            destination = map[location][DIRECTIONS][dest]
+            print(f"\nYou have moved {dest.upper()}.")
+            move_handler(destination)
         else:
-            print("You cannot move that way!")
-            player_move(location)
+            for key, value in direction_synonyms.items():
+                if dest in value:
+                    if key in map[location][DIRECTIONS]:
+                        destination = map[location][DIRECTIONS][key]
+                        print(f"\nYou have moved {key.upper()}.")
+                        move_handler(destination)
+                        break
+            else:
+                print("You cannot move that way!")
+                player_move(character, location, None)
+    else:
+        dest = action
+
+        if dest in map[location][DIRECTIONS]:
+            destination = map[location][DIRECTIONS][dest]
+            print(f"\nYou have moved {dest.upper()}.")
+            move_handler(destination)
+        else:
+            for key, value in direction_synonyms.items():
+                if dest in value:
+                    if key in map[location][DIRECTIONS]:
+                        destination = map[location][DIRECTIONS][key]
+                        print(f"\nYou have moved {key.upper()}.")
+                        move_handler(destination)
+                        break
+            else:
+                print("You cannot move that way!")
+                prompt(character)
 
 
 def move_handler(dest):
@@ -826,23 +1030,23 @@ def move_handler(dest):
         dest (str): destination
     """
 
+    # REMOVE AFTER TESTING
     print("\n" + "You have moved to " + dest + ".")
-    setattr(player, 'location', dest)
+
+    setattr(player, "location", dest)
     current_pos(dest)
 
 
 def current_pos(location):
-    """checks where the player is and prints it
-    """
+    """checks where the player is and prints it"""
     print(map[location][PLACENAME])
     print(map[location][DESCRIPTION])
     if NPC in map[location]:
         print("Someone's waving at you... (Type talk)")
-        #NPC interaction function
 
     if ENEMY in map[location]:
         print("enemy")
-        #ENEMY FIGHT OR flee interaction function
+        # ENEMY FIGHT OR flee interaction function
 
 
 def player_inspect(character):
@@ -875,28 +1079,36 @@ def createClass():
             "Pick a planet. Earth, Mars(Not Available), Venus(Not Available)"
         ).lower()
     if planet_choice == "earth":
-        #stats
+        # stats
         playerHealth = 100
-        playerAttack = 999  #15
+        playerAttack = 999  # 15
         playerDefence = 10
         playerLuck = random.randint(1, 10)
         playerName = input("Enter your name:").title()
-        playerLocation = 'a3'
+        playerLocation = "a3"
         while True:
-            if playerName == " ":
-                print("Your name is not *redacted* ")
-                playerName = input(
-                    "Enter your name! To put in our database").title()
+            if playerName == "":
+                print("CANDACE: Your name is not *redacted*")
+                playerName = input("CANDACE: Please put your actual name").title()
             else:
-                print("Welcome,", playerName, "#413485 to planet, Kepler-62e.")
+                print("CANDACE: Welcome,", playerName, "#413485 to planet, Kepler-62e.")
                 break
     else:
         print("Invalid Input!!")
-    return (playerHealth, playerAttack, playerDefence, playerLuck, playerName,
-            playerLocation)
+    return (
+        playerHealth,
+        playerAttack,
+        playerDefence,
+        playerLuck,
+        playerName,
+        playerLocation,
+    )
 
 
 def intro_to_earth(character):
+    print("\n" + map[character.location][PLACENAME])
+    print(map[character.location][DESCRIPTION])
+    print("TIP - Stuck? Type Help")
     while True:
         prompt(character)
     # print("Good job, let's get out of here!")
@@ -909,7 +1121,7 @@ def intro_to_earth(character):
     # #time.sleep(2)
     # print("30 minutes later")
     # #time.sleep(3)
-    # print("Welcome,", character.getName(),
+    # print("Welcome,", character.name,
     #       "to the Upper Chambers, a deep voice said.")
     # #time.sleep(4)
     # print("Do you know why your presence has been requested?")
@@ -932,83 +1144,77 @@ def intro_to_earth(character):
     # print("To you 2000 years ago.")
     # #time.sleep(3)
     # print("Chapter 1 - Earth - Pilot")
-    #time.sleep(3)
+    # time.sleep(3)
 
 
 def tutorial():
-    """Start game
-    """
+    """Start game"""
     clear()
     print("-----SYSTEMS ONLINE-----")
-    #time.sleep(1.75)
+    # time.sleep(1.75)
     print("Vital signs online. Systems Check. Boys we did it!")
-    #time.sleep(1.5)
+    # time.sleep(1.5)
     print(".....")
-    #time.sleep(2)
+    # time.sleep(2)
     print("He's waking up!")
-    #time.sleep(1.25)
+    # time.sleep(1.25)
     print(".....")
     # time.sleep(1.5)
     print("Good morning! My name is Candace, your personal advisor!")
-    #time.sleep(2)
-    print(
-        "Where are you? Well you're in a private room, on planet Kepler-62e.")
-    #time.sleep(3)
+    # time.sleep(2)
+    print("Where are you? Well you're in a private room, on planet Kepler-62e.")
+    # time.sleep(3)
     print(
         "Who are you? You, my friend, are a collection of several lives over many millennia, you are part of a secret program of the government."
     )
-    #time.sleep(4)
-    print(
-        "Your job is to find life-suitable planets and find any mysteries on it."
-    )
-    #time.sleep(4)
+    # time.sleep(4)
+    print("Your job is to find life-suitable planets and find any mysteries on it.")
+    # time.sleep(4)
     print(
         "Our recent research suggests that we have a single star system, with three possible candidates for our program, it is 26 million light years away."
     )
-    #time.sleep(5)
+    # time.sleep(5)
     print(
         "Fortunately, we have sucessfully developed, I.G.U.D.\nThe Interstellar Great Universal Directory!\nWhich, means you can travel 26 million light years in seconds!"
     )
-    #time.sleep(4)
+    # time.sleep(4)
     print(
         "We also have developed a new gun for you.. If there's anyone that gets in your way.\nWe'll do a little practice later."
     )
-    #time.sleep(4)
+    # time.sleep(4)
     print("For now.. we'll finish downloading all the data...")
-    #time.sleep(2)
+    # time.sleep(2)
     print("You woke up, in an all white room.")
-    #time.sleep(2.5)
+    # time.sleep(2.5)
     print("'Listen to them!', he said in awfully fearful voice.")
-    #time.sleep(3)
+    # time.sleep(3)
     print(
         "Hello!\nBefore we practice the combat system. We need to pick a planet to go to for your main mission. We recommend Earth for your first mission."
     )
     class_data = createClass()
 
-    character = player(class_data[0], class_data[1], class_data[2],
-                       class_data[3], class_data[4], class_data[5])
+    character = player(
+        class_data[0],
+        class_data[1],
+        class_data[2],
+        class_data[3],
+        class_data[4],
+        class_data[5],
+    )
 
-    pprint(vars(character))
-    #time.sleep(3)
+    # time.sleep(3)
     print(
-        """Attack is how much damage you will deal to the enemy minus their defence.
-          \nDefence is how much you damage you'll block from an enemy's attack.
-          \nLuck affects the choices you make in the story and if your attack is going to hit the enemy or not.
-          \nWhen Health reaches 0, you are dead and the game is over. You can g
-          ain health at the end of combat and in other places.
-          \nYour first spell is 'Sleep', which renders your enemy unable to anything. Your next attack against a asleep enemy deals double damage and awakens your enemy."""
+        "Attack is how much damage you will deal to the enemy minus their defence.\nDefence is how much you damage you'll block from an enemy's attack.\nLuck affects the choices you make in the story and if your attack is going to hit the enemy or not.\nWhen Health reaches 0, you are dead and the game is over. You can gain health at the end of combat and in other places.\nYour first spell is 'Sleep', which renders your enemy unable to anything. Your next attack against a asleep enemy deals double damage and awakens your enemy."
     )
-    #time.sleep(10)
-    print(
-        "Follow the instructions inculuded in the combat system. Do not try to flee."
-    )
-    #time.sleep(.75)
+    # time.sleep(10)
+    print("Follow the instructions inculuded in the combat system. Do not try to flee.")
+    # time.sleep(.75)
     print("3")
-    #time.sleep(1)
+    # time.sleep(1)
     print("2")
-    #time.sleep(1)
+    # time.sleep(1)
     print("1")
-    #time.sleep(1)
+    # time.sleep(1)
     print("Let's practice!!")
     intro_to_earth(character)
 
@@ -1047,7 +1253,6 @@ def tutorial():
 
 tutorial()
 
-# def main():
 
 # window = tk.Tk()
 # window.title('Hello Python')
