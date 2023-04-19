@@ -687,7 +687,7 @@ DIRECTIONS = "directions"
 map = {
     # npc test a3
     "a3": {
-        PLACENAME: "Dr. Ock's lab (Start Position)",
+        PLACENAME: "Dr. Ock's lab",
         DESCRIPTION: "A fire broke out in the lab - find your boss, Dr. Ock",
         INSPECT: "There is a big hallway in front (north) of you.",
         ITEMS: ["test"],
@@ -884,6 +884,7 @@ def prompt(character):
     for dir in map[character.location][DIRECTIONS]:
         possible_dir.append(dir)
     print("\n------------------------")
+    print(map[character.location][PLACENAME] + "\n")
     print("What do you want to do?")
     print(f"You can move {', '.join(possible_dir)}.")
     action = input("> ").lower()
@@ -917,6 +918,7 @@ def prompt(character):
             "inv",
             "inventory",
             "take",
+            "c",
         ]
         while action not in legal_actions:
             # ensures that the player can do mutliple actions on one line after the player already inputed only one action in one line
@@ -941,7 +943,7 @@ def prompt(character):
 
         if action in ["quit", "q"]:
             while True:
-                print("Are you sure you want to quit?")
+                print("Are you sure you want to quit? (y or n)")
                 quit = input("> ")
                 if quit.lower() in ["y", "yes"]:
                     exit()
@@ -953,7 +955,7 @@ def prompt(character):
 
         elif action in ["help", "h"]:
             print(
-                "Move by inputing MOVE or M OR type move then the location (e.g. MOVE NORTH or M N)\nInspect by inputing INSPECT or I\nFight by inputing FIGHT or F\nStuck? Input HELP or H\nLeaving? Input QUIT or Q.\nChecking your inventory? Input INVENTORY or INV\nPick up an item? Input TAKE. For multiple items. Input TAKE (ITEM NAME). Pick up everything? Input TAKE ALL\nAll inputs are case-insentive.\n "
+                "Move by inputing MOVE or M OR type move then the location (e.g. MOVE NORTH or M N)\nInspect by inputing INSPECT or I\nFight by inputing FIGHT or F\nStuck? Input HELP or H\nLeaving? Input QUIT or Q.\nChecking your inventory? Input INVENTORY or INV\nPick up an item? Input TAKE. For multiple items. Input TAKE (ITEM NAME). Pick up everything? Input TAKE ALL\nCheck your stats? Input C\nnAll inputs are case-insentive.\n "
             )
 
         elif action in ["move", "m"]:
@@ -969,7 +971,10 @@ def prompt(character):
                 player_move(character, character.location, None)
 
         elif action in ["talk", "t"]:
-            npc_handler(character)
+            if NPC in map[character.location]:
+                npc_handler(character)
+            else:
+                print("There is no one to talk to...")
 
         elif action in ["inspect", "i"]:
             player_inspect(character.location)
@@ -988,6 +993,10 @@ def prompt(character):
                 print("There is nothing to take...")
             else:
                 item_handler(character, character.location, None)
+        elif action in ["c"]:
+            print(
+                f"\nName: {character.name}\nAttack: {character.attack}\nDefence: {character.defence}"
+            )
         # elif action == "fight" or 'f':
         #     player_combat(enemy, character)
 
@@ -1077,11 +1086,12 @@ def player_inspect(location):
         dest (str): destination
         character (obj): player
     """
+    global take_tip
     if INSPECT in map[location]:
         if not map[location][INSPECT]:
             print("You've already checked here...")
         else:
-            text_effect(map[location][INSPECT])
+            print("\n" + map[location][INSPECT])
             map[location][INSPECT] = None
     else:
         text_effect("There is nothing here....")
@@ -1089,12 +1099,18 @@ def player_inspect(location):
         items = []
         for item in map[location][ITEMS]:
             items.append(item)
-        if take_tip == 0:
-            text_effect(
-                f"\nThere is a {', '.join(items)} (To pick up type TAKE or if they're mutiple items type TAKE (ITEM NAME) or TAKE ALL to take everything)."
-            )
-        text_effect(f"\nThere is a {', '.join(items)}.")
-        map[location][INSPECT] = None
+        if not items:
+            pass
+        else:
+            if take_tip:
+                print(
+                    f"There is a {', '.join(items)} (To pick up type TAKE or if they're mutiple items type TAKE (ITEM NAME) or TAKE ALL to take everything)."
+                )
+                take_tip = False
+            else:
+                text_effect(f"There is a {', '.join(items)}.")
+
+            map[location][INSPECT] = None
 
 
 def item_handler(character, location, action):
@@ -1103,11 +1119,21 @@ def item_handler(character, location, action):
         for item in map[location][ITEMS]:
             items.append(item)
             inventory.append(item)
-        text_effect(f"Added {', '.join(items)} to inventory.")
+            map[location][ITEMS].remove(item)
+        if not items:
+            print("You've already taken all the items here...")
+        else:
+            text_effect(f"Added {', '.join(items)} to inventory.")
+            for item in items:
+                attack_increase = item_list[item]["attack"]
+                character.attack = character.attack + attack_increase
+                print(
+                    f" By equipping {item} attack increased by {attack_increase}! Your attack is now {character.attack}!"
+                )
 
 
 # item list and stats
-items = {
+item_list = {
     "Rustic Lazer Pistol": {
         "description": "A old lazer pistol - looks ancient.",
         "attack": 2,
@@ -1138,7 +1164,7 @@ def createClass():
     if planet_choice == "earth":
         # stats
         playerHealth = 100
-        playerAttack = 999  # 15
+        playerAttack = 15
         playerDefence = 10
         playerLuck = random.randint(1, 10)
         playerName = input("Enter your name:").title()
@@ -1164,9 +1190,8 @@ def createClass():
 
 def intro_to_earth(character):
     global take_tip
-    take_tip = 0
-    print("\n" + map[character.location][PLACENAME])
-    print(map[character.location][DESCRIPTION])
+    take_tip = True
+    print("\n" + "QUEST: " + map[character.location][DESCRIPTION])
     print("TIP - Stuck? Type HELP.")
     while True:
         prompt(character)
