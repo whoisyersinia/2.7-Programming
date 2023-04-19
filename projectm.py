@@ -690,6 +690,7 @@ map = {
         PLACENAME: "Dr. Ock's lab (Start Position)",
         DESCRIPTION: "A fire broke out in the lab - find your boss, Dr. Ock",
         INSPECT: "There is a big hallway in front (north) of you.",
+        ITEMS: ["test"],
         DIRECTIONS: {"north": "b3"},
     },
     "b3": {
@@ -698,6 +699,7 @@ map = {
         INSPECT: "There is a big hallway in front of you.",
         DIRECTIONS: {"north": "c3"},
     },
+    # item - place later
     "c1": {
         PLACENAME: "Bio Lab",
         DESCRIPTION: "There is something shiny in front of you",
@@ -845,11 +847,8 @@ def npc_handler(character):
 
 
 # npc
-
-
 def dr_ock(dialogue, character):
     """TO-DO: print letter by letter"""
-
     if dialogue == 1:
         time.sleep(0.5)
         text_effect(
@@ -884,14 +883,14 @@ def prompt(character):
     possible_dir = []
     for dir in map[character.location][DIRECTIONS]:
         possible_dir.append(dir)
-    print("------------------------")
+    print("\n------------------------")
     print("What do you want to do?")
     print(f"You can move {', '.join(possible_dir)}.")
-    action = input("> ")
+    action = input("> ").lower()
 
     if split_string(action):
         command, noun = split_string(action)  # type: ignore
-        if command.lower() == "move" or "m":
+        if command.lower() in ["move", "m"]:
             if (
                 NPC in map[character.location]
                 and not map[character.location][NPC]["escapable"]
@@ -915,11 +914,15 @@ def prompt(character):
             "q",
             "talk",
             "t",
+            "inv",
+            "inventory",
+            "take",
         ]
         while action not in legal_actions:
+            # ensures that the player can do mutliple actions on one line after the player already inputed only one action in one line
             if split_string(action):
                 command, noun = split_string(action)  # type: ignore
-                if command.lower() == "move" or "m":
+                if command.lower() in ["move", "m"]:
                     if (
                         NPC in map[character.location]
                         and not map[character.location][NPC]["escapable"]
@@ -936,24 +939,24 @@ def prompt(character):
                 action = input("> ")
                 continue
 
-        if action.lower() == "quit":
+        if action in ["quit", "q"]:
             while True:
                 print("Are you sure you want to quit?")
                 quit = input("> ")
-                if quit.lower() == "y":
+                if quit.lower() in ["y", "yes"]:
                     exit()
-                elif quit.lower() == "n":
+                elif quit.lower() in ["n", "no"]:
                     prompt(character)
                     break
                 else:
                     continue
 
-        elif action.lower() == "help":
+        elif action in ["help", "h"]:
             print(
-                "Move by inputing 'move' or 'm' OR type move then the location (e.g. move north)\nInspect by inputing 'inspect' or 'i'\nFight by inputing 'fight' or 'f'\nStuck? Input 'help' or 'h'\nLeaving? Input 'quit' or 'q'\n "
+                "Move by inputing MOVE or M OR type move then the location (e.g. MOVE NORTH or M N)\nInspect by inputing INSPECT or I\nFight by inputing FIGHT or F\nStuck? Input HELP or H\nLeaving? Input QUIT or Q.\nChecking your inventory? Input INVENTORY or INV\nPick up an item? Input TAKE. For multiple items. Input TAKE (ITEM NAME). Pick up everything? Input TAKE ALL\nAll inputs are case-insentive.\n "
             )
 
-        elif action.lower() in ["move", "m"]:
+        elif action in ["move", "m"]:
             if (
                 NPC in map[character.location]
                 and not map[character.location][NPC]["escapable"]
@@ -965,9 +968,26 @@ def prompt(character):
             else:
                 player_move(character, character.location, None)
 
-        elif action.lower() in ["talk", "t"]:
+        elif action in ["talk", "t"]:
             npc_handler(character)
 
+        elif action in ["inspect", "i"]:
+            player_inspect(character.location)
+
+        elif action in ["inventory", "inv"]:
+            if not inventory:
+                print("You have nothing on you...")
+            else:
+                items = []
+                for item in inventory:
+                    items.append(item)
+                print(f"Inventory: {', '.join(items)}.")
+
+        elif action in ["take"]:
+            if map[character.location][INSPECT]:
+                print("There is nothing to take...")
+            else:
+                item_handler(character, character.location, None)
         # elif action == "fight" or 'f':
         #     player_combat(enemy, character)
 
@@ -1042,22 +1062,59 @@ def current_pos(location):
     print(map[location][PLACENAME])
     print(map[location][DESCRIPTION])
     if NPC in map[location]:
-        print("Someone's waving at you... (Type talk)")
+        text_effect("Someone's waving at you... (Type talk)")
 
     if ENEMY in map[location]:
         print("enemy")
         # ENEMY FIGHT OR flee interaction function
 
 
-def player_inspect(character):
+# tip pop-up
+def player_inspect(location):
     """Handles movement by changign the player's current location and setting it as the new pos
 
     Args:
         dest (str): destination
         character (obj): player
     """
-    print(map[character.getLocation()][INSPECT])
+    if INSPECT in map[location]:
+        if not map[location][INSPECT]:
+            print("You've already checked here...")
+        else:
+            text_effect(map[location][INSPECT])
+            map[location][INSPECT] = None
+    else:
+        text_effect("There is nothing here....")
+    if ITEMS in map[location]:
+        items = []
+        for item in map[location][ITEMS]:
+            items.append(item)
+        if take_tip == 0:
+            text_effect(
+                f"\nThere is a {', '.join(items)} (To pick up type TAKE or if they're mutiple items type TAKE (ITEM NAME) or TAKE ALL to take everything)."
+            )
+        text_effect(f"\nThere is a {', '.join(items)}.")
+        map[location][INSPECT] = None
 
+
+def item_handler(character, location, action):
+    if not action:
+        items = []
+        for item in map[location][ITEMS]:
+            items.append(item)
+            inventory.append(item)
+        text_effect(f"Added {', '.join(items)} to inventory.")
+
+
+# item list and stats
+items = {
+    "Rustic Lazer Pistol": {
+        "description": "A old lazer pistol - looks ancient.",
+        "attack": 2,
+        "type": "weapon",
+    },
+    "test": {"description": "test", "attack": 1, "type": "weapon"},
+}
 
 ### GAMELOOP ###
 
@@ -1106,9 +1163,11 @@ def createClass():
 
 
 def intro_to_earth(character):
+    global take_tip
+    take_tip = 0
     print("\n" + map[character.location][PLACENAME])
     print(map[character.location][DESCRIPTION])
-    print("TIP - Stuck? Type Help")
+    print("TIP - Stuck? Type HELP.")
     while True:
         prompt(character)
     # print("Good job, let's get out of here!")
@@ -1251,6 +1310,9 @@ def tutorial():
     #         print("Invalid input!")
 
 
+# player default settings
+inventory = []
+# end player default settings
 tutorial()
 
 
