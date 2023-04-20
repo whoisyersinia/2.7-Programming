@@ -123,7 +123,7 @@ class enemy:
 
     @property
     def specialtime(self):
-        return self._special
+        return self._specialtime
 
     @property
     def magicresist(self):
@@ -166,7 +166,7 @@ def enemyGen(level):
     """Generates enemies by giving them random generated stats (attack, defense etc...) based on their level.
 
     Args:
-        level (int): The level of enemy to bee generated
+        level (int): The level of enemy to be generated
 
     Returns:
         _type_: _description_
@@ -205,7 +205,7 @@ def enemyGen(level):
         attack = random.randint(5, 15)
         defence = random.randint(1, 3)
         special = random.randint(10, 20)
-        chance = random.randint(1, 5)
+        chance = random.randint(1, 3)
         special_time = random.randint(4, 5)
         magic_resist = random.randint(1, 3)
         return enemy(
@@ -224,7 +224,7 @@ def enemyGen(level):
         attack = random.randint(15, 25)
         defence = random.randint(5, 10)
         special = random.randint(30, 50)
-        chance = random.randint(2, 6)
+        chance = random.randint(1, 5)
         special_time = random.randint(6, 8)
         magic_resist = random.randint(2, 4)
         return enemy(
@@ -273,27 +273,23 @@ def enemyAttack(hitChance, attackValue, name, defence, luck):
     Returns:
         int: How much the player has received as damage
     """
-    time.sleep(2)
-    print(name, "is winding up for an attack...")
+    time.sleep(0.5)
+    print("\n" + name, "is winding up for an attack...")
 
-    if luck < 3:
-        hit = random.randint(1, 3)
-    elif luck >= 3 and luck <= 7:
-        hit = random.randint(1, 5)
-    elif luck > 7 and luck <= 9:
-        hit = random.randint(1, 8)
-    else:
-        hit = random.randint(1, 10)
+    hit = random_luck(luck)
+    hitchance = random_luck(hitChance)
 
-    if hitChance >= hit:
-        print("it hits you..")
+    if hitchance >= hit:
+        time.sleep(2.5)
+        print("it hits you...")
         if attackValue < defence:
             print(f"Your Defence startles {name}!")
             return 0
         else:
             loss = attackValue - defence
-            print("You didn't dodge, losing...", loss, "health")
-            return math.ceil(loss)
+            loss = math.ceil(loss)
+            print(f"You didn't dodge, losing {loss} health")
+            return loss
     else:
         print("The enemy misses!")
         return 0
@@ -311,18 +307,40 @@ def enemySpecialAttack(attackValue, name, defence):
     Returns:
         int: How much the player has received as damage
     """
-    time.sleep(2)
+    time.sleep(1.25)
     print(name, "is winding up for a power move...")
-    time.sleep(2)
-    print("it hits you.. ")
+    time.sleep(1.75)
+    print("IT LANDS!")
     loss = attackValue - defence / 2
-    print("You didn't anticipate it, halving your defence, losing...", loss, "health")
-    return math.ceil(loss)
+    loss = math.ceil(loss)
+    print(f"You didn't anticipate it losing {loss} health")
+    return loss
+
+
+def random_luck(luck):
+    """Determines the chance value depending on the player's or enemy's chance
+
+    Args:
+        luck (int): the luck or chance value
+
+    Returns:
+        chance (int): the chance to determine if an attack is going to hit
+    """
+    if luck < 3:
+        chance = random.randint(1, 3)
+    elif luck >= 3 and luck <= 7:
+        chance = random.randint(1, 5)
+    elif luck > 7 and luck <= 9:
+        chance = random.randint(1, 8)
+    else:
+        chance = random.randint(1, 10)
+
+    return chance
 
 
 # if your attack is going to hit
 def hitChance(luck, chance, name):
-    """Formula for determining the chance of an enemy hitting the player
+    """Formula for determining the chance of an player hitting the enemy
 
     Args:
         luck (int): The player's luck
@@ -331,29 +349,18 @@ def hitChance(luck, chance, name):
     Returns:
         bool: true if it hits, false if it doesn't
     """
-    hit_random = random.randint(1, 3)
-    if hit_random != 1:
-        if luck < chance:
-            time.sleep(1)
-            print("MISS!")
-            return False
-        else:
-            time.sleep(1)
-            print(f"You hit the {name}!")
-            return True
+
+    player_chance = random_luck(luck)
+    enemy_chance = random_luck(chance) - 2
+
+    if enemy_chance > player_chance:
+        time.sleep(1)
+        print("MISS!")
+        return False
     else:
-        if luck >= 5:
-            random_chance = random.randint(1, 2)
-        else:
-            random_chance = random.randint(1, 3)
-        if random_chance != 1:
-            time.sleep(1)
-            print("MISS!")
-            return False
-        else:
-            time.sleep(1)
-            print(f"You hit the {name}!")
-            return True
+        time.sleep(1)
+        print(f"You hit the {name}!")
+        return True
 
 
 # all special attacks
@@ -376,6 +383,17 @@ def critChance(luck):
     else:
         crit_chance = random.randint(1, 3)
     if crit_chance == 1:
+        return True
+    else:
+        return False
+
+
+def parry(luck, chance, defence, enemyAttack):
+    player_luck = random_luck(luck)
+    enemy_luck = random_luck(chance)
+    if enemyAttack > defence * 2:
+        return False
+    elif player_luck > enemy_luck:
         return True
     else:
         return False
@@ -412,10 +430,11 @@ def isDead(health):
 # gameover with quit()
 def gameOver(Name):
     """Gameover screen"""
-    print("-----SYSTEMS SHUTTING DOWN-----")
-    print("The Planet will now secure your stored data into our database")
-    print("Good Bye", Name)
-    time.sleep(5)
+    print("\n-----SYSTEMS SHUTTING DOWN-----")
+    print("The Planet will now secure your stored data into our database...")
+    time.sleep(2)
+    print(f"Goodbye {Name}...")
+    time.sleep(3)
     quit()
 
 
@@ -432,25 +451,35 @@ def combat(enemy, character, escapable):
     # default starting combat variables
     try_parry = False
     crit = False
-    count = 0
-    blocked_dmg = 0
-    magic_cd = 0
+    count = -1
+    magic_cd = -1
     sleep = False
     sleep_time = 0
-    magic_cd = 0
     combat = True
+    turn = 0
 
     time.sleep(0.2)
     text_effect(
         "\nAn enemy has spotted you.\nYou get ready and are now entering combat."
     )
     time.sleep(0.2)
-    text_effect(f"\nA wild, {enemy.name}, has appeared!")
-    while combat == True:
+    text_effect(f"\nA wild, {enemy.name}, has appeared!\n")
+    while combat:
+        magic_cd -= 1
         if magic_cd < 0:
             magic_cd = 0
-        time.sleep(0.5)
-        text_effect(f"\n{enemy.name} has {enemy.health} health.\n")
+        characterDead = isDead(character.health)
+        turn += 1
+        count += 1
+        if characterDead:
+            combat = False
+            gameOver(character.name)
+        else:
+            time.sleep(1)
+            text_effect(f"\nTurn {turn}")
+            text_effect(f"\nYou have {character.health} health.")
+            text_effect(f"\n{enemy.name} has {enemy.health} health.\n")
+
         if escapable:
             print(
                 "\nWhat action do you want to take?\nFight(1) - Attack:",
@@ -461,7 +490,7 @@ def combat(enemy, character, escapable):
                 character.defence,
                 "\nFlee(4) - Luck:",
                 character.luck,
-                f"\nInspect(5) - View {enemy.name} Stats.".format(magic_cd),
+                f"\nInspect(5) - View {enemy.name}'s Stats.".format(magic_cd),
             )
         else:
             print(
@@ -472,7 +501,7 @@ def combat(enemy, character, escapable):
                 "\nBlock(3) - Defence:",
                 character.defence,
                 "\nYou cannot flee! This option is unavaliable!",
-                f"\nInspect(5) - View {enemy.name} Stats.".format(magic_cd),
+                f"\nInspect(5) - View {enemy.name}'s Stats.".format(magic_cd),
             )
         time.sleep(0.75)
         action = input("> ")
@@ -480,15 +509,12 @@ def combat(enemy, character, escapable):
         while action not in legal_actions:
             print("Invalid Input! Please try again.")
             action = input("> ")
-        if sleep_time == 0 and sleep == True:
+        if sleep_time == 0 and sleep:
             print(f"{enemy.name} has awoken...")
             sleep = False
-        if magic_cd <= 0:
-            magic_cd = 0
         if action == "1":
-            blocked_dmg = 0
             try_parry = False
-            if sleep == True:
+            if sleep:
                 print(f"You prepare for an attack against the motionless {enemy.name}!")
                 time.sleep(1)
                 damage = character.attack * 2
@@ -510,8 +536,8 @@ def combat(enemy, character, escapable):
                 print("You prepare for an attack.")
                 hit = hitChance(character.luck, enemy.chance, enemy.name)
                 crit = critChance(character.luck)
-                if hit == True:
-                    if crit == True:
+                if hit:
+                    if crit:
                         crit_dmg = damage * 2
                         enemy.health = enemy.health - crit_dmg
                         print("......")
@@ -523,16 +549,15 @@ def combat(enemy, character, escapable):
                         print("CRITICAL HIT!!!!")
                         time.sleep(1)
                         print(f"You damage {enemy.name} for,", crit_dmg, "health.\n")
+
                     else:
                         enemy.health = enemy.health - damage
                         time.sleep(2)
                         print(f"You damage {enemy.name} for,", damage, "health.\n")
-                        count += 1
-                else:
-                    print("You missed!")
+
         elif action == "2":
             cast_try = castSleep(character.luck, enemy.chance, enemy.magicresist)
-            if cast_try == True and magic_cd == 0:
+            if cast_try and magic_cd == 0:
                 print("......")
                 time.sleep(1.5)
                 print("......")
@@ -546,7 +571,7 @@ def combat(enemy, character, escapable):
             elif magic_cd > 0:
                 print("{} more turns to cast 'Sleep'\n".format(magic_cd))
                 time.sleep(0.75)
-                print(".......")
+                continue
             else:
                 print("......")
                 time.sleep(1.5)
@@ -559,64 +584,70 @@ def combat(enemy, character, escapable):
         elif action == "3":
             crit = False
             try_parry = True
-            blocked_dmg = character.defence
-            print(f"You prepare for {enemy.name} attack....")
-            count += 1
+            print(f"You prepare for {enemy.name}'s attack....")
         elif action == "4":
             try_parry = False
             if escapable:
                 crit = False
                 flee = character.luck
                 if flee < enemy.chance or enemy.defence == 0:
-                    print("You haven't sucessfully fled...")
-                    count += 1
+                    print("You haven't sucessfully fled...\n")
                 else:
                     print("You fled...")
+                    map[character.location][ENEMY]["escapable"] = None
                     combat = False
+                    break
             else:
-                print("You haven't sucessfully fled...")
-                count += 1
+                print("You haven't sucessfully fled...\n")
         else:
             try_parry = False
             print(
-                f"\nName: {enemy.name}\nAttack: {enemy.attack}\nDefence: {enemy.defence}\nLuck: {enemy.chance}\nMagic Resist: {enemy.magicresist}"
+                f"\nName: {enemy.name}\nAttack: {enemy.attack}\nDefence: {enemy.defence}\nLuck: {enemy.chance}\nMagic Resist: {enemy.magicresist}\nSpecial time: {enemy.specialtime}\n"
             )
+            turn -= 1
+            count -= 1
+            magic_cd -= 1
             continue
 
         enemyDead = isDead(enemy.health)
 
-        if sleep == True:
+        # ENEMY TURN
+        if sleep:
             time.sleep(0.75)
             print("Zzzzz....")
-            magic_cd -= 1
             sleep_time -= 1
-            count += 1
         else:
-            if enemyDead == False:
+            if not enemyDead:
+                time.sleep(1.5)
                 if count + 1 == enemy.specialtime:
                     time.sleep(1)
-                    print(f"{enemy.name}is staring at you.....")
-                    magic_cd -= 1
-                if count >= enemy.specialtime and try_parry == True:
-                    count = 0
+                    print(f"{enemy.name} is staring at you.....")
+                elif count >= enemy.specialtime and try_parry:
                     print(f"The {enemy.name}'s special attack affected your stance!!")
                     try_parry = False
                     character.health = character.health - enemySpecialAttack(
                         enemy.special, enemy.name, character.defence
                     )
-                    characterDead = isDead(character.health)
-                    magic_cd -= 1
                     count = 0
-                elif try_parry == True:
-                    if blocked_dmg > enemy.attack:
-                        time.sleep(2)
+                elif count >= enemy.specialtime:
+                    character.health = character.health - enemySpecialAttack(
+                        enemy.special, enemy.name, character.defence
+                    )
+                    count = 0
+
+                # when player blocked
+                elif try_parry:
+                    if parry(
+                        character.luck, enemy.chance, character.defence, enemy.attack
+                    ):
+                        time.sleep(1.25)
                         print(f"You parried {enemy.name}'s attack!")
                         characterDead = isDead(character.health)
-                        blocked_dmg = 0
-                        magic_cd -= 1
                     else:
-                        time.sleep(2)
-                        print(f"The {enemy.name}'s attack overwhelmed your defence!")
+                        time.sleep(1.25)
+                        print(
+                            f"You can feel {enemy.name}'s terrifying aura, unallowing you to block..."
+                        )
                         character.health = character.health - enemyAttack(
                             enemy.chance,
                             enemy.attack,
@@ -624,8 +655,6 @@ def combat(enemy, character, escapable):
                             character.defence,
                             character.luck,
                         )
-                        characterDead = isDead(character.health)
-                        magic_cd -= 1
                 else:
                     # enemy attack minus player health
                     character.health = character.health - enemyAttack(
@@ -635,39 +664,29 @@ def combat(enemy, character, escapable):
                         character.defence,
                         character.luck,
                     )
-                    characterDead = isDead(character.health)
-                    magic_cd -= 1
 
-                # if you're dead ends combat and plays gameover
-                if characterDead == True:
-                    combat = False
-                    gameOver(character.name)
-
-                else:
-                    time.sleep(1.5)
-                    print("You have", character.health, "health remaining.")
-                    print(f"{enemy.name} has", enemy.health, "health remaining.")
             else:
                 # ends combat if you have defeated the enemy and regenerates health
                 combat = False
                 print(f"You have sucessfully defeated {enemy.name}!!!")
                 if character.health != 100:
-                    character.health(
-                        character.health + random.randint(1, character.luck)
-                    )
+                    post_health = character.health
+                    regenerated_health = (
+                        character.health
+                    ) = character.health + random.randint(character.luck, 15)
                     if character.health > 100:
                         character.health = 100
-                    else:
-                        time.sleep(1.5)
-                        print(
-                            "You have regenerated.\nYour health after combat is",
-                            character.health,
-                        )
-                        print("All cooldowns reset!")
+                    regen = regenerated_health - post_health
+                    time.sleep(0.5)
+                    print(
+                        f"You have regenerated {regen} health.\nYour health post-combat is {character.health}.",
+                    )
+                    # GAIN ITEMS
+                    print("All cooldowns reset!")
                 else:
                     character.health = 100
-                    time.sleep(1.5)
-                    print("You have 100 Health.")
+                    time.sleep(0.5)
+                    print("FLAWLESS VICTORY!")
                     print("All cooldowns reset!")
                 return True
 
@@ -690,7 +709,7 @@ NPC = "npc"
 ENEMY = "enemy"
 DIRECTIONS = "directions"
 map = {
-    # npc test a3
+    # ITEM TEST a3
     "a3": {
         PLACENAME: "Dr. Ock's lab",
         DESCRIPTION: "A fire broke out in the lab - find your boss, Dr. Ock",
@@ -699,12 +718,13 @@ map = {
         ITEMS: ["test"],
         DIRECTIONS: {"north": "b3"},
     },
+    # ENEMY TEST
     "b3": {
         PLACENAME: "Lab Hallway",
         DESCRIPTION: "A long hallway that leads to the emergency escape pods.",
         INSPECT: "There is a big hallway in front of you.",
-        ENEMY: {"name": None, "level": 1, "escapable": False},
         DIRECTIONS: {"north": "c3"},
+        ENEMY: {"level": 1, "escapable": True},
     },
     # item - place later
     "c1": {
@@ -720,8 +740,9 @@ map = {
         INSPECT: "open",
         DIRECTIONS: {"north": "c1", "south": "c3"},
     },
+    # NORTH OR WEST ENEMY TEST PASSED
     "c3": {
-        PLACENAME: "Lab Hallway",
+        PLACENAME: "Lab Hallway Bio Lab Junction",
         DESCRIPTION: "A long hallway that leads to the emergency escape pods, there is a door on your left.",
         INSPECT: "There is a big hallway in front of you.",
         DIRECTIONS: {"north": "d3", "west": "c2"},
@@ -736,7 +757,7 @@ map = {
     "e1": {
         PLACENAME: "Escape Pod Hallway",
         DESCRIPTION: "There is something in front of you.",
-        ENEMY: {"name": "test", "level": 1, "escapable": False},
+        ENEMY: {"level": 1, "escapable": False},
         DIRECTIONS: {"south": "e2", "east": "f1"},
     },
     "e2": {
@@ -888,13 +909,58 @@ def dr_ock(dialogue, character):
 
 def prompt(character):
     """puts out a prompt for all the possible actions a player can take"""
+    global unescapable_enemy_tip
+    global enemy_tip
+    # list for dynamic data
     possible_dir = []
+    dynamic_commands = []
+    enemy_location = {}
     for dir in map[character.location][DIRECTIONS]:
         possible_dir.append(dir)
+
+        enemy_position = map[character.location][DIRECTIONS][dir]
+        if ENEMY not in map[enemy_position]:
+            pass
+        else:
+            if map[enemy_position][ENEMY]["escapable"] == False:
+                enemy_location[dir] = enemy_position
+
+    if ENEMY not in map[character.location]:
+        pass
+    elif map[character.location][ENEMY]["escapable"]:
+        if enemy_tip:
+            dynamic_commands.append(
+                "A foe stands in your way, you can still FLEE, FIGHT, or MOVE.\nTIP: There is an enemy you can choose to FIGHT (input 'FIGHT' OF 'F') or FLEE ('FLEE' or 'E'). You can still MOVE ('MOVE' or 'M').\nFLEEING eliminates the enemy with no reward, preventing you from coming back and fighting it."
+            )
+            enemy_tip = False
+        else:
+            dynamic_commands.append(
+                "A foe stands in your way, you can still FLEE, FIGHT, or MOVE."
+            )
+    else:
+        pass
+    for dir, pos in enemy_location.items():
+        if map[pos][ENEMY]["escapable"] == False:
+            if unescapable_enemy_tip:
+                dynamic_commands.append(
+                    f"You sense an overwheliming aura {', '.join(enemy_location.keys()).upper()} of you. You should proceed with caution.\nTIP: There is an enemy you can't FLEE from in that location. Get ready before moving there..."
+                )
+                unescapable_enemy_tip = False
+                break
+            else:
+                dynamic_commands.append(
+                    f"You sense an overwheliming aura {', '.join(enemy_location.keys()).upper()} of you. You should proceed with caution."
+                )
+                break
+
     print("\n------------------------")
     print(map[character.location][PLACENAME] + "\n")
     print("What do you want to do?")
     print(f"You can move {', '.join(possible_dir)}.")
+    if dynamic_commands:
+        for command in dynamic_commands:
+            # TEXT EFFECT LATER
+            print(f"\nCANDACE: {command}\n")
     action = input("> ").lower()
 
     if split_string(action):
@@ -1004,12 +1070,12 @@ def prompt(character):
                 item_handler(character, character.location, None)
         elif action in ["c"]:
             print(
-                f"\nName: {character.name}\nAttack: {character.attack}\nDefence: {character.defence}\nLuck: {character.luck}"
+                f"\nName: {character.name}\nHealth: {character.health} \nAttack: {character.attack}\nDefence: {character.defence}\nLuck: {character.luck}"
             )
         elif action in ["fight", "f"]:
             if (
                 map[character.location][ENEMY]
-                and not map[character.location][ENEMY]["escapable"]
+                and map[character.location][ENEMY]["escapable"]
             ):
                 combat(
                     enemyGen(map[character.location][ENEMY]["level"]),
@@ -1022,9 +1088,12 @@ def prompt(character):
         elif action in ["flee", "e"]:
             if (
                 map[character.location][ENEMY]
-                and not map[character.location][ENEMY]["escapable"]
+                and map[character.location][ENEMY]["escapable"]
             ):
                 map[character.location][ENEMY]["escapable"] = None
+                print(
+                    "You ran away from the enemy. It seems like it loss track of you..."
+                )
             else:
                 print("There is no one to escape from...")
 
@@ -1107,7 +1176,11 @@ def current_pos(location, character):
             "You can hear footsteps behind you!",
             "Someone's trying to ambush you!",
         ]
-        enemy_initiate = ["Someone's tapping your shoulder!\n"]
+        enemy_initiate = [
+            "Someone's tapping your shoulder!\n",
+            "You can hear someone running towards you!\n",
+            "UNKNOWN: STOP RIGHT THERE!\n",
+        ]
         if map[location][ENEMY]["escapable"] == True:
             time.sleep(0.75)
             text_effect(random.choice(enemy_initiate_escapable))
@@ -1199,31 +1272,20 @@ def createClass():
     global playerName
     global playerLocation
 
-    planet_choice = input(
-        "Pick a planet. Earth, Mars(Not Available), Venus(Not Available)"
-    ).lower()
-    while planet_choice != "earth":
-        print("Invalid Input!")
-        planet_choice = input(
-            "Pick a planet. Earth, Mars(Not Available), Venus(Not Available)"
-        ).lower()
-    if planet_choice == "earth":
-        # stats
-        playerHealth = 100
-        playerAttack = 15
-        playerDefence = 3
-        playerLuck = random.randint(1, 10)
-        playerName = input("Enter your name:").title()
-        playerLocation = "a3"
-        while True:
-            if playerName == "":
-                print("CANDACE: Your name is not *redacted*")
-                playerName = input("CANDACE: Please put your actual name").title()
-            else:
-                print("CANDACE: Welcome,", playerName, "#413485 to planet, Kepler-62e.")
-                break
-    else:
-        print("Invalid Input!!")
+    # stats
+    playerHealth = 100
+    playerAttack = 15
+    playerDefence = 3
+    playerLuck = random.randint(1, 10)
+    playerName = input("Enter your name:").title()
+    playerLocation = "a3"
+    while True:
+        if playerName == "":
+            print("CANDACE: Your name is not *redacted*")
+            playerName = input("CANDACE: Please put your actual name").title()
+        else:
+            print("CANDACE: Welcome,", playerName, "#413485 to planet, Kepler-62e.")
+            break
     return (
         playerHealth,
         playerAttack,
@@ -1236,7 +1298,11 @@ def createClass():
 
 def intro_to_earth(character):
     global take_tip
+    global unescapable_enemy_tip
+    global enemy_tip
+    enemy_tip = True
     take_tip = True
+    unescapable_enemy_tip = True
     print("\n" + "QUEST: " + map[character.location][DESCRIPTION])
     print("TIP - Stuck? Type HELP.")
     while True:
