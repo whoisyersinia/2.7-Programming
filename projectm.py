@@ -782,6 +782,7 @@ ITEMS = "items"
 NPC = "npc"
 ENEMY = "enemy"
 DIRECTIONS = "directions"
+LOCKED = "locked"
 map = {
     # ITEM TEST (PASSED)
     "a3": {
@@ -789,14 +790,27 @@ map = {
         DESCRIPTION: "A fire broke out in the lab - find your boss, Dr. Ock",
         INSPECT: "There is a big hallway in front (north) of you.",
         DIRECTIONS: {"north": "b3"},
+        ITEMS: {
+            "Bio Lab Key": {
+                "description": "A small key with a label that reads 'Biology Lab'.",
+                "type": "misc",
+            },
+            "Rustic Laser Pistol (Attack: +2)": {
+                "description": "A old lazer pistol - looks ancient.",
+                "attack": 2,  # temporary
+                "type": "weapon",
+                "level": 1,
+            },
+        },
     },
-    # ENEMY TEST LOCATION
+    # ENEMY TEST LOCATION - PUT KEY LATER HERE
     "b3": {
         PLACENAME: "Lab Hallway",
         DESCRIPTION: "A long hallway that leads to the emergency escape pods.",
         INSPECT: "There is a big hallway in front of you.",
         DIRECTIONS: {"north": "c3"},
         ENEMY: {"level": 1, "escapable": False},
+        LOCKED: {"status": True, "key": "Bio Lab Key"},
     },
     # item - place later
     "c1": {
@@ -806,11 +820,13 @@ map = {
         ITEMS: [],
         DIRECTIONS: {"south": "c2"},
     },
+    # LOCKED DOOR NORTH
     "c2": {
         PLACENAME: "Bio Lab Door",
         DESCRIPTION: 'A door that has "Biology Lab" written on it',
-        INSPECT: "open",
+        INSPECT: "The door leading to the biology lab seems to be shut tight...",
         DIRECTIONS: {"north": "c1", "south": "c3"},
+        LOCKED: {"status": True, "key": "bio_lab_key"},
     },
     # NORTH OR WEST ENEMY TEST PASSED
     "c3": {
@@ -997,6 +1013,7 @@ def prompt(character):
     # global vars for tips
     global unescapable_enemy_tip
     global enemy_tip
+    global item_tip
     # list for dynamic data
     possible_dir = []
     dynamic_commands = []
@@ -1008,6 +1025,7 @@ def prompt(character):
         if ENEMY not in map[enemy_position]:
             pass
         else:
+            # finds all the locations where they're inescapable enemies
             if map[enemy_position][ENEMY]["escapable"] == False:
                 enemy_location[dir] = enemy_position
 
@@ -1042,6 +1060,20 @@ def prompt(character):
                 )
                 break
 
+    if (
+        INSPECT in map[character.location]
+        and ITEMS in map[character.location]
+        and map[character.location][ITEMS]
+    ):
+        if item_tip:
+            dynamic_commands.append(
+                f"There is something glistening in the corner...\nTIP: There is an item nearby, INSPECT and find out what lies behind."
+            )
+            item_tip = False
+
+        else:
+            dynamic_commands.append(f"There is something glistening in the corner...")
+
     print("\n------------------------")
     print(map[character.location][PLACENAME] + "\n")
     print("What do you want to do?")
@@ -1049,7 +1081,7 @@ def prompt(character):
     if dynamic_commands:
         for command in dynamic_commands:
             # TEXT EFFECT LATER
-            print(f"\nCANDACE: {command}\n")
+            print(f"\n{command}")
     action = input("> ").lower()
     while True:
         if split_string(action):
@@ -1221,6 +1253,15 @@ def prompt(character):
                 action = input("> ")
 
 
+def key_checker(destination):
+    for item in inventory:
+        if item in map[destination][LOCKED]["key"]:
+            text_effect(f"Used {item}.\n.")
+        return True
+    else:
+        return False
+
+
 def player_move(character, location, action):
     """Moves the player
 
@@ -1246,9 +1287,23 @@ def player_move(character, location, action):
                 if dest in value:
                     if key in map[location][DIRECTIONS]:
                         destination = map[location][DIRECTIONS][key]
-                        print(f"\nYou have moved {key.upper()}.")
-                        move_handler(destination, character)
-                        break
+                        if (
+                            LOCKED in map[destination]
+                            and map[destination][LOCKED]["status"]
+                        ):
+                            if key_checker(destination):
+                                map[destination][LOCKED]["status"] = False
+                                move_handler(destination, character)
+                            else:
+                                print(
+                                    f"The door {key.upper()} is locked. A key should be around...."
+                                )
+                                prompt(character)
+                                break
+                        else:
+                            print(f"\nYou have moved {key.upper()}.")
+                            move_handler(destination, character)
+                            break
             else:
                 print("You cannot move that way!")
                 player_move(character, location, None)
@@ -1264,9 +1319,24 @@ def player_move(character, location, action):
                 if dest in value:
                     if key in map[location][DIRECTIONS]:
                         destination = map[location][DIRECTIONS][key]
-                        print(f"\nYou have moved {key.upper()}.")
-                        move_handler(destination, character)
-                        break
+                        if (
+                            LOCKED in map[destination]
+                            and map[destination][LOCKED]["status"]
+                        ):
+                            if key_checker(destination):
+                                map[destination][LOCKED]["status"] = False
+                                move_handler(destination, character)
+                            else:
+                                print(
+                                    f"The door {key.upper()} is locked. A key should be around...."
+                                )
+                                prompt(character)
+                                break
+
+                        else:
+                            print(f"\nYou have moved {key.upper()}.")
+                            move_handler(destination, character)
+                            break
             else:
                 print("You cannot move that way!")
                 prompt(character)
@@ -1364,30 +1434,33 @@ def item_handler(character, location, action):
         for item in map[location][ITEMS]:
             items.append(item)
             inventory.append(item)
-
         if not items:
             print("You've already taken all the items here...")
         else:
-            text_effect(f"Added {', '.join(items)} to inventory.")
             for item in items:
-                if "weapon" in item_list[item].values():
-                    attack_increase = item_list[item]["attack"]
+                if map[location][ITEMS][item]["type"] == "weapon":
+                    attack_increase = map[location][ITEMS][item]["attack"]
                     character.attack = character.attack + attack_increase
                     text_effect(
-                        f"By equipping {item} attack increased by {attack_increase}! Your attack is now {character.attack}!"
+                        f"You equipped {item}. {map[location][ITEMS][item]['description']} Attack increased by {attack_increase}! Your attack is now {character.attack}!\n"
                     )
-                elif "armour" in item_list[item].values():
-                    defence_increase = item_list[item]["defence"]
+                elif map[location][ITEMS][item]["type"] == "armour":
+                    defence_increase = item_list[ITEMS][item]["defence"]
                     character.defence = character.defence + defence_increase
                     text_effect(
-                        f"By equipping {item} defence increased by {defence_increase}! Your defence is now {character.defence}!"
+                        f"By equipping {item} defence increased by {defence_increase}! Your defence is now {character.defence}!\n"
                     )
-                elif "charm" in item_list[item].values():
-                    luck_increase = item_list[item]["luck"]
+                elif map[location][ITEMS][item]["type"] == "charm":
+                    luck_increase = map[location][ITEMS][item]["luck"]
                     character.defence = character.defence + luck_increase
                     text_effect(
-                        f"By equipping {item} luck increased by {luck_increase}! Your luck is now {character.luck}!"
+                        f"By equipping {item} luck increased by {luck_increase}! Your luck is now {character.luck}!\n"
                     )
+                elif map[location][ITEMS][item]["type"] == "misc":
+                    text_effect(
+                        f"You picked up {item}. {map[location][ITEMS][item]['description']}\n"
+                    )
+                map[location][ITEMS].pop(item)
 
 
 def enemy_drop(enemylevel):
@@ -1455,8 +1528,10 @@ def intro_to_earth(character):
     global take_tip
     global unescapable_enemy_tip
     global enemy_tip
+    global item_tip
     enemy_tip = True
     take_tip = True
+    item_tip = True
     unescapable_enemy_tip = True
     print("\n" + "QUEST: " + map[character.location][DESCRIPTION])
     print("TIP - Stuck? Type HELP.")
