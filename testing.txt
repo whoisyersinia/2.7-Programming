@@ -1,9 +1,0 @@
-Test for movement:
-Expected Results
-Unexpected Results:
-Boundary: 
-
-
-
-Comments:
-One major change I did was remake the map to be more efficent, removing any Null values. This made me change how my code checks for the players input and move them, from if and elif statements to one if statement. 
